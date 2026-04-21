@@ -11,6 +11,33 @@ import PracticePage from './components/Practice/PracticePage'
 import TeamBadge from './components/Team/TeamBadge'
 import BrandingFields from './components/Team/BrandingFields'
 
+// ── Splash screen ────────────────────────────────────────────────
+function SplashScreen({ onDone }) {
+  const [fadeOut, setFadeOut] = useState(false)
+
+  useEffect(() => {
+    const fadeTimer = setTimeout(() => setFadeOut(true), 1700)
+    const doneTimer = setTimeout(() => onDone(), 2200)
+    return () => { clearTimeout(fadeTimer); clearTimeout(doneTimer) }
+  }, [])
+
+  return (
+    <div style={{
+      position: 'fixed', inset: 0, zIndex: 99999,
+      background: '#0d0d1a',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      opacity: fadeOut ? 0 : 1,
+      transition: 'opacity 0.5s ease-in-out',
+    }}>
+      <img
+        src="/coachpad_cover.png"
+        alt="CoachPad Tactix"
+        style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }}
+      />
+    </div>
+  )
+}
+
 // ── New Team modal (shown from team switcher) ────────────────────
 const DIVISIONS = ['8U', '10U', '12U', '14U', '16U', '19U']
 
@@ -503,6 +530,11 @@ function AppContent({ tab, setTab, onSignOut }) {
 export default function App() {
   const { session, signOut } = useAuth()
   const [tab, setTab] = useState('team')
+  const [showSplash, setShowSplash] = useState(() => {
+    const seen = sessionStorage.getItem('splashShown')
+    if (!seen) { sessionStorage.setItem('splashShown', 'true'); return true }
+    return false
+  })
 
   useEffect(() => {
     Object.entries(theme).forEach(([key, value]) => {
@@ -531,8 +563,17 @@ export default function App() {
   if (!session) return <AuthPage />
 
   return (
-    <AppProvider userId={session.user.id}>
-      <AppContent tab={tab} setTab={setTab} onSignOut={signOut} />
-    </AppProvider>
+    <>
+      {showSplash && <SplashScreen onDone={() => setShowSplash(false)} />}
+      <div style={{
+        opacity: showSplash ? 0 : 1,
+        transition: 'opacity 0.3s ease-in',
+        visibility: showSplash ? 'hidden' : 'visible',
+      }}>
+        <AppProvider userId={session.user.id}>
+          <AppContent tab={tab} setTab={setTab} onSignOut={signOut} />
+        </AppProvider>
+      </div>
+    </>
   )
 }
