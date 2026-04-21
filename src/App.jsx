@@ -480,12 +480,17 @@ function AppContent({ tab, setTab, onSignOut }) {
       {tab !== 'lineup' && (
         <div style={{
           position: 'fixed',
-          top: 6,
-          right: 10,
-          fontSize: 9,
-          color: 'rgba(255,255,255,0.18)',
+          right: -28,
+          bottom: 70,
+          fontSize: 8,
+          color: 'rgba(255,255,255,0.15)',
           pointerEvents: 'none',
           zIndex: 9999,
+          transform: 'rotate(-90deg)',
+          transformOrigin: 'right center',
+          letterSpacing: '1px',
+          whiteSpace: 'nowrap',
+          userSelect: 'none',
         }}>
           Created by Gava Motion
         </div>
