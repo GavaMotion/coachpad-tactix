@@ -1,0 +1,1143 @@
+export const DIVISIONS_ORDER = ['8U', '10U', '12U', '14U', '16U', '19U']
+
+export const CATEGORY_META = {
+  'warm-up':          { label: 'Warm-Up',          color: '#f59e0b' },
+  dribbling:          { label: 'Dribbling',        color: '#f97316' },
+  passing:            { label: 'Passing',          color: '#3b82f6' },
+  shooting:           { label: 'Shooting',         color: '#ef4444' },
+  defending:          { label: 'Defending',        color: '#a855f7' },
+  teamwork:           { label: 'Teamwork',         color: '#22c55e' },
+  'cool-down':        { label: 'Cool-Down',        color: '#64748b' },
+}
+
+export const CATEGORY_ORDER = [
+  'warm-up', 'dribbling', 'passing', 'shooting', 'defending', 'teamwork', 'cool-down',
+]
+
+export const PHASE_META = {
+  'warm-up':          { label: 'Warm-Up',          color: '#f59e0b' },
+  'skill-work':       { label: 'Skill Work',        color: '#6366f1' },
+  'small-sided-game': { label: 'Small-Sided Game',  color: '#06b6d4' },
+}
+
+/** Returns true if the drill is appropriate for a given division (or 'all') */
+export function matchesDivision(drill, selected) {
+  if (selected === 'all') return true
+  return DIVISIONS_ORDER.indexOf(drill.minDivision) <= DIVISIONS_ORDER.indexOf(selected)
+}
+
+export const DRILLS = [
+  {
+    id: 'galaxy-battles',
+    name: 'Galaxy Battles',
+    description:
+      'Every player has a ball and dribbles freely in a defined area. Players try to knock others\' balls out while protecting their own. Lose your ball? Do 5 jumping jacks and re-enter. Last player with their ball wins.',
+    category: 'dribbling',
+    minDivision: '8U',
+    phase: 'skill-work',
+    duration: 10,
+    players: '6–16',
+    equipment: ['balls', 'cones'],
+    coachingPoints: [
+      'Use all surfaces of both feet',
+      'Keep the ball close — no more than two steps away',
+      'Head up to see the space and other players',
+      'Change direction quickly when you sense a defender coming',
+    ],
+    videoUrl: 'https://aysou.video/galaxy',
+    diagram: 'grid-dribble',
+    variations: [
+      'Left foot only, then right foot only',
+      'Add a second Alien (coach) to reduce the safe area',
+    ],
+  },
+  {
+    id: 'around-the-compass',
+    name: 'Around the Compass',
+    description:
+      'Place 4 cones around each player in North, South, East, West positions (~5 yards out). Coach calls a direction; players sprint-dribble to that cone and back to center. Increase speed each round.',
+    category: 'dribbling',
+    minDivision: '8U',
+    phase: 'warm-up',
+    duration: 8,
+    players: '4–20',
+    equipment: ['balls', 'cones'],
+    coachingPoints: [
+      'Soft touches to keep ball close',
+      'Knees slightly bent for balance',
+      'Use drag-back turn at the center cone',
+      'Try a different turn or fake at each outer point',
+    ],
+    videoUrl: 'https://aysou.video/compass',
+    diagram: 'compass',
+    variations: [
+      'Time challenge — how fast can you go around all four points?',
+      'Change direction of travel (go counter-clockwise)',
+    ],
+  },
+  {
+    id: 'the-race',
+    name: 'The Race',
+    description:
+      'Two parallel slalom cone courses set 15 yards long. Players race in pairs — dribble to the end, go around the last cone, and dribble back. Can be run as a relay with teams. First team to 5 wins advances.',
+    category: 'dribbling',
+    minDivision: '8U',
+    phase: 'warm-up',
+    duration: 8,
+    players: '4–20',
+    equipment: ['balls', 'cones'],
+    coachingPoints: [
+      'Head up while dribbling',
+      'Ball should never be more than a step away',
+      'Accelerate out of each turn',
+      'Use the outside of the foot around cones',
+    ],
+    videoUrl: 'https://aysou.video/dmts',
+    diagram: 'race',
+    variations: [
+      'Have both players dribble a ball',
+      'Run as a relay — teams of 3 race each other',
+    ],
+  },
+  {
+    id: 'the-cage',
+    name: 'The Cage',
+    description:
+      'Mark a 10×10-yard square. One player inside dribbles to keep possession while 2–3 players on the outside try to poke the ball through the cage walls. Player inside scores a point each minute they survive.',
+    category: 'dribbling',
+    minDivision: '10U',
+    phase: 'skill-work',
+    duration: 12,
+    players: '3–8',
+    equipment: ['balls', 'cones'],
+    coachingPoints: [
+      '360° awareness — always know where the defenders are',
+      'Shift weight to screen the ball',
+      'Change pace suddenly to escape pressure',
+    ],
+    diagram: 'cage',
+    variations: [
+      'Increase outside defenders to 4',
+      'Expand to 15×15 yards and add two players inside',
+    ],
+  },
+  {
+    id: 'rondo',
+    name: 'Rondo',
+    description:
+      'Groups of 5–7 form a circle; 1–2 defenders go in the middle. Outer players maintain possession with 1–2 touches. Any defender who wins the ball swaps with the player who lost it. Award points for 10+ consecutive passes.',
+    category: 'passing',
+    minDivision: '10U',
+    phase: 'skill-work',
+    duration: 15,
+    players: '5–9',
+    equipment: ['balls', 'cones'],
+    coachingPoints: [
+      'Move to create passing angles immediately',
+      'Play the ball quickly — do not hold it',
+      'Communicate with teammates',
+      'Defenders: press together, do not split',
+    ],
+    diagram: 'rondo',
+    variations: [
+      '3v1 for younger or less experienced players',
+      'One-touch only for advanced players',
+    ],
+  },
+  {
+    id: '1v1-to-goal',
+    name: '1v1 to Goal',
+    description:
+      'Set up pairs in a 10×15-yard zone with a small goal at one end. Coach serves the ball to the attacker who tries to beat the defender and score. Defenders reset to goal-side position for each rep. Rotate every 90 seconds.',
+    category: 'shooting',
+    minDivision: '10U',
+    phase: 'skill-work',
+    duration: 15,
+    players: '4–12',
+    equipment: ['balls', 'cones', 'small goals'],
+    coachingPoints: [
+      'Attacker: use a quick change of direction to beat the defender',
+      'Defender: stay patient, stay goal-side',
+      'Shoot early — don\'t wait for a perfect moment',
+    ],
+    diagram: '1v1-goal',
+    variations: [
+      'Add a second defender who enters after 3 seconds',
+      'Play 2v1 — two attackers vs one defender',
+    ],
+  },
+  {
+    id: 'shooting-drill',
+    name: 'Shooting Drill',
+    description:
+      'Players line up at three angles outside the 18: left, center, right. Goalkeeper in goal. Feeder serves a rolling ball; player takes a first-touch shot. Rotate through all three positions. Add a passive defender for 12U+.',
+    category: 'shooting',
+    minDivision: '10U',
+    phase: 'skill-work',
+    duration: 12,
+    players: '4–16',
+    equipment: ['balls', 'cones', 'goal'],
+    coachingPoints: [
+      'Approach at an angle — open your body to the goal',
+      'Non-kicking foot next to the ball, pointing at target',
+      'Chest over the ball to keep the shot low',
+    ],
+    variations: [
+      'Add a passive defender who becomes active after the shot',
+      'Use volleys instead of first-touch ground shots',
+    ],
+  },
+  {
+    id: 'pressing-shape',
+    name: 'Pressing Shape',
+    description:
+      'Two groups of 6 on a half-field. Ball-circulation group passes around the outside. Defending group works on unified pressing triggers: when the ball goes to a wide zone, everyone presses in coordinated shape. Rotate every 4 minutes.',
+    category: 'defending',
+    minDivision: '12U',
+    phase: 'skill-work',
+    duration: 15,
+    players: '8–16',
+    equipment: ['balls', 'cones'],
+    coachingPoints: [
+      'First defender pressures the ball immediately',
+      'Second defender covers the most dangerous passing lane',
+      'Third defender provides depth and balance',
+      'Press as a unit — not individually',
+    ],
+    variations: [
+      'Add a fourth defender to practice full team pressing shape',
+      'Start from different areas of the field',
+    ],
+  },
+  {
+    id: 'possession-game',
+    name: 'Possession Game',
+    description:
+      'Two teams of 4–5 play keep-away in a 20×20-yard area with no goals. Score 1 point for every 5 consecutive passes. Losing team starts with 0 passes after a turnover. First to 5 points wins. Switch up teams after each game.',
+    category: 'teamwork',
+    minDivision: '10U',
+    phase: 'small-sided-game',
+    duration: 20,
+    players: '8–12',
+    equipment: ['balls', 'cones'],
+    coachingPoints: [
+      'Stay on the move — get open after every pass',
+      'Communicate with your teammates',
+      'Play away from pressure, toward space',
+    ],
+    variations: [
+      'Add a neutral player who always plays with the team in possession',
+      'Score only when all teammates have touched the ball in a single sequence',
+    ],
+  },
+  {
+    id: 'free-scrimmage',
+    name: 'Free Scrimmage',
+    description:
+      'Open small-sided game (3v3 to 6v6 based on roster) with minimal coaching intervention. Let players solve problems, express creativity, and apply what they learned. Ideal as the final activity of every practice.',
+    category: 'teamwork',
+    minDivision: '8U',
+    phase: 'small-sided-game',
+    duration: 20,
+    players: '6–16',
+    equipment: ['balls', 'cones', 'goals'],
+    coachingPoints: [
+      'Let the game be the teacher',
+      'Celebrate creativity and effort',
+      'Only stop play for safety',
+    ],
+    variations: [
+      'Restrict to two-touch to encourage quicker decisions',
+      'Add a target player on each end line for a bonus scoring option',
+    ],
+  },
+  {
+    id: 'passing-gates',
+    name: 'Passing Gates',
+    description:
+      'Scatter 8–10 small gates (two cones 2 yards apart) across the field. Players work in pairs: score a point by passing the ball through a gate so the partner receives on the other side. Move to a different gate after each success. Pair with the most gates in 5 minutes wins.',
+    category: 'passing',
+    minDivision: '8U',
+    phase: 'skill-work',
+    duration: 10,
+    players: '4–20',
+    equipment: ['balls', 'cones'],
+    coachingPoints: [
+      'Weight your pass — not too hard, not too soft',
+      'Receiver moves to the gate before the pass arrives',
+      'Scan for open gates as soon as you receive',
+    ],
+    diagram: 'passing-gates',
+    variations: [
+      'Score only counts if the receiver controls with their weaker foot',
+      'Race — team with most gates in 5 min wins',
+    ],
+  },
+  {
+    id: 'target-player',
+    name: 'Target Player',
+    description:
+      'Teams play on a narrow field (30×20 yards). Each team has a target player standing just behind the opponent\'s end line. Score by passing the ball to your target player who controls it cleanly. Target player returns it and play resumes.',
+    category: 'teamwork',
+    minDivision: '12U',
+    phase: 'small-sided-game',
+    duration: 20,
+    players: '8–14',
+    equipment: ['balls', 'cones'],
+    coachingPoints: [
+      'Play forward when safe — look for the target',
+      'Create width to stretch the defense',
+      'Target player: hold the ball under pressure, look to combine',
+    ],
+    variations: [
+      'Target player can only use their weaker foot',
+      'Add a second target player on each end line',
+    ],
+  },
+  {
+    id: 'world-cup',
+    name: 'World Cup',
+    description:
+      'Players split into teams of 2. Coach serves ball into the middle and each team tries to score on one goal with a keeper. First team to score steps off; last team remaining loses. Encourages shooting mentality and risk-taking.',
+    category: 'shooting',
+    minDivision: '10U',
+    phase: 'small-sided-game',
+    duration: 15,
+    players: '4–16',
+    equipment: ['balls', 'goals'],
+    coachingPoints: [
+      'Shoot early before the keeper sets',
+      'Work quickly with your partner to score',
+      'Be brave — take risks in front of goal',
+    ],
+    variations: [
+      'Play 3v3 instead of 2v2',
+      'Add penalty kicks if no team scores in 90 seconds',
+    ],
+  },
+  {
+    id: 'kick-out',
+    name: 'Kick Out',
+    description:
+      'Players each have a ball in a 25×25 grid. Half start with balls and try to keep them while the other half try to win a ball. At the end of a timed period, players without a ball lose. Works on dribbling, shielding, defending, and field vision.',
+    category: 'dribbling',
+    minDivision: '10U',
+    phase: 'skill-work',
+    duration: 12,
+    players: '8–20',
+    equipment: ['balls', 'cones'],
+    coachingPoints: [
+      'Shield the ball with your body between you and the defender',
+      'Keep your head up to see who is near',
+      'Win a ball and protect it immediately',
+    ],
+    diagram: 'grid-dribble',
+    variations: [
+      'No shielding allowed — must use skill moves to escape',
+      'If your ball leaves the grid, do 5 toe taps and re-enter immediately',
+    ],
+  },
+  {
+    id: 'circle-keep-away',
+    name: 'Circle Keep Away',
+    description:
+      'Players form a circle using the center circle. Three players start in the middle defending while outside players play one-touch keep away. If a player loses the ball, they and the two players beside them go to the middle. Encourages support and looking beyond the closest player.',
+    category: 'passing',
+    minDivision: '12U',
+    phase: 'skill-work',
+    duration: 15,
+    players: '8–16',
+    equipment: ['balls'],
+    coachingPoints: [
+      'Play the ball away from the nearest defender',
+      'Support at angles — don\'t stand in a straight line',
+      'One touch when possible to keep it moving',
+    ],
+    variations: [
+      'Allow two-touch instead of one-touch',
+      'Reduce the circle size to increase pressure on the outside players',
+    ],
+  },
+  {
+    id: 'sprint-pass-receive',
+    name: 'Sprint Pass Receive',
+    description:
+      'Two players 20 yards apart. Player A passes to player B and immediately sprints backwards. Player B sprints forward to meet the ball and passes back. Repeat continuously. Works on passing, receiving, going to meet the ball, and conditioning.',
+    category: 'passing',
+    minDivision: '10U',
+    phase: 'skill-work',
+    duration: 12,
+    players: '2–20',
+    equipment: ['balls', 'cones'],
+    coachingPoints: [
+      'Move toward the ball to receive — don\'t wait for it',
+      'Pass with pace so your partner doesn\'t have to wait',
+      'Sprint immediately after your pass',
+    ],
+    diagram: 'two-lines',
+    variations: [
+      'Add a cone to dribble around before passing back',
+      'Progress to lofted passes instead of ground passes',
+    ],
+  },
+  {
+    id: 'four-corners-passing',
+    name: 'Four Corners Passing',
+    description:
+      'Players on each corner of a square with balls. Four players in the middle call for the ball, receive it, play it back, then explode to another corner. Progress to one-touch and receiving from hands. Works on passing, receiving, communication, and movement.',
+    category: 'passing',
+    minDivision: '12U',
+    phase: 'skill-work',
+    duration: 15,
+    players: '8–16',
+    equipment: ['balls', 'cones'],
+    coachingPoints: [
+      'Call for the ball before it arrives',
+      'Open your body to see where you\'re going next',
+      'Explode out of your receiving position',
+    ],
+    diagram: 'four-corners',
+    variations: [
+      'Add a fifth player in the center competing for the ball',
+      'Use two balls simultaneously for advanced players',
+    ],
+  },
+  {
+    id: 'three-zones-shape-game',
+    name: 'Three Zones Shape Game',
+    description:
+      'Field divided into three vertical thirds. Play a regular game where any team without a player in all three zones loses a point. Goals worth 4 points. Encourages proper offensive width and defensive compactness.',
+    category: 'teamwork',
+    minDivision: '14U',
+    phase: 'small-sided-game',
+    duration: 25,
+    players: '10–16',
+    equipment: ['balls', 'cones', 'goals'],
+    coachingPoints: [
+      'Spread across all three zones at all times',
+      'Defenders stay compact and connected when out of possession',
+      'Attackers create width to stretch the defense',
+    ],
+    variations: [
+      'Relax the zone rule so only two players need to be in different zones',
+      'Bonus rule: goal scored from own half = 2 points',
+    ],
+  },
+  {
+    id: 'four-goals-game',
+    name: 'Four Goals Game',
+    description:
+      'Set up four goals at the edges of a wide playing area. Two teams each attack two opposite goals by dribbling through them. One player per team must kneel until teammates win the ball and find them. Encourages organization, communication, and finding a target player.',
+    category: 'teamwork',
+    minDivision: '14U',
+    phase: 'small-sided-game',
+    duration: 20,
+    players: '8–14',
+    equipment: ['balls', 'cones', 'goals'],
+    coachingPoints: [
+      'Find your kneeling target player as soon as you win the ball',
+      'Communicate constantly with teammates',
+      'Attack quickly before the other team can organize',
+    ],
+    variations: [
+      'Remove the kneeling rule once the team understands the concept',
+      'Add two neutral players available to both teams',
+    ],
+  },
+  {
+    id: 'gate-shooting',
+    name: 'Gate Shooting',
+    description:
+      'A gate made of two cones sits 15 yards from goal with three balls nearby. Player jumps over the gate and back three times then shoots quickly. Repeat for all three balls. Works on conditioning, quick shooting, and staying low on the shot.',
+    category: 'shooting',
+    minDivision: '12U',
+    phase: 'skill-work',
+    duration: 15,
+    players: '4–16',
+    equipment: ['balls', 'cones', 'goal'],
+    coachingPoints: [
+      'Stay low after the jumps to get set quickly',
+      'Strike through the ball — don\'t scoop it',
+      'Pick your target before you arrive at the ball',
+    ],
+    variations: [
+      'Add a goalkeeper',
+      'Vary the starting position — left, center, and right of gate in sequence',
+    ],
+  },
+  {
+    id: 'center-circle-warmup',
+    name: 'Center Circle Warmup Game',
+    description:
+      'Use center circle as boundary. Two small goals on opposite sides. 4v4 inside with remaining players on the outside, one touch only. Last defender is keeper. When a team scores the other team rotates out. Fast transitions and lots of shooting in tight space.',
+    category: 'teamwork',
+    minDivision: '10U',
+    phase: 'warm-up',
+    duration: 10,
+    players: '8–16',
+    equipment: ['balls', 'small goals'],
+    coachingPoints: [
+      'One touch — don\'t hold the ball',
+      'Transition fast when you win possession',
+      'Outside players stay active and ready to rotate',
+    ],
+    variations: [
+      'Remove the one-touch restriction for 8U',
+      'Two keepers, two goals — creates fast chaos',
+    ],
+  },
+  {
+    id: 'sharks-and-minnows',
+    name: 'Sharks and Minnows',
+    description:
+      'Minnows (players with balls) line up on one end and must dribble to the other side without losing their ball to the sharks (players without balls). If a minnow loses their ball they become a shark. Works on dribbling under pressure, change of direction, and defending.',
+    category: 'dribbling',
+    minDivision: '8U',
+    phase: 'warm-up',
+    duration: 10,
+    players: '8–20',
+    equipment: ['balls', 'cones'],
+    coachingPoints: [
+      'Minnows: keep ball close under pressure',
+      'Look up to spot where sharks are',
+      'Dribble fast when shark is looking away',
+      'Sharks: stay patient and approach slowly',
+    ],
+    diagram: 'sharks',
+    variations: [
+      'Start on the long side of the grid to give minnows more room',
+      'A shark who steals a ball becomes a minnow',
+    ],
+  },
+  {
+    id: 'red-light-green-light',
+    name: 'Red Light Green Light',
+    description:
+      'Players dribble in a grid. Green light = dribble fast, red light = stop with foot on ball, yellow = slow. Add colors progressively: blue = hide behind ball, purple = run around ball. Works on ball control, change of speed, and listening.',
+    category: 'dribbling',
+    minDivision: '8U',
+    phase: 'warm-up',
+    duration: 8,
+    players: '6–20',
+    equipment: ['balls', 'cones'],
+    coachingPoints: [
+      'Small touches to stay in control at speed',
+      'Stop cleanly — sole of the foot on the ball',
+      'Listen carefully and react fast',
+    ],
+    variations: [
+      'Add purple = spin around the ball',
+      'Players call out the colors to build team leadership',
+    ],
+  },
+  {
+    id: 'cops-and-robbers',
+    name: 'Cops and Robbers',
+    description:
+      'Robbers (with balls) try to knock over cones by kicking their ball at them. Cops (without balls) run around and stand cones back up. Works on passing accuracy, teamwork, change of direction, and eye-foot coordination.',
+    category: 'passing',
+    minDivision: '8U',
+    phase: 'warm-up',
+    duration: 10,
+    players: '8–20',
+    equipment: ['balls', 'cones'],
+    coachingPoints: [
+      'Aim at the cones — accuracy over power',
+      'Cops: communicate and split up to cover more ground',
+      'Pass, then move to a new angle',
+    ],
+    variations: [
+      'Time it — how many cones can robbers knock down in 2 minutes?',
+      'Cops must dribble a ball while standing cones back up',
+    ],
+  },
+  {
+    id: 'freeze-tag-nutmeg',
+    name: 'Freeze Tag with Nutmeg',
+    description:
+      'One or two taggers without balls try to tag players who are dribbling. When tagged, player holds ball above their head. To be unfrozen, a teammate must dribble the ball through their legs (nutmeg). Works on dribbling under pressure, awareness, and teamwork.',
+    category: 'dribbling',
+    minDivision: '8U',
+    phase: 'warm-up',
+    duration: 10,
+    players: '8–20',
+    equipment: ['balls', 'cones'],
+    coachingPoints: [
+      'Head up — see the tagger before they reach you',
+      'Shield your ball while frozen so teammates can nutmeg you',
+      'Rescue teammates quickly so your team stays strong',
+    ],
+    variations: [
+      'Two taggers from the start',
+      'Frozen players can be unfrozen by a pass through their legs instead of a nutmeg',
+    ],
+  },
+  {
+    id: 'keep-your-yard-clean',
+    name: 'Keep Your Yard Clean',
+    description:
+      'Field split in two with many balls on both sides. Teams continuously kick balls from their side to the other side. Team with fewest balls on their half at the end wins. Fun passing and shooting game for young players.',
+    category: 'passing',
+    minDivision: '8U',
+    phase: 'small-sided-game',
+    duration: 10,
+    players: '8–20',
+    equipment: ['balls', 'cones'],
+    coachingPoints: [
+      'Strike the ball clean and low',
+      'Work as a team — some kick, some gather',
+      'Move to open space on your half after each kick',
+    ],
+    variations: [
+      'Add a goalkeeper on each side to block shots',
+      'Count down from 20 for added urgency',
+    ],
+  },
+  {
+    id: '1v1-steal-the-bacon',
+    name: '1v1 Steal the Bacon',
+    description:
+      'Teams line up by the goal, each player assigned a number. Coach calls out numbers and tosses a ball to midfield. Called players race to the ball — team that gets it attacks, the other defends. Play resets after each stop or goal. Works on 1v1 defending and attacking.',
+    category: 'defending',
+    minDivision: '10U',
+    phase: 'small-sided-game',
+    duration: 15,
+    players: '6–20',
+    equipment: ['balls', 'cones', 'goal'],
+    coachingPoints: [
+      'Defender: get goal-side quickly',
+      'Attacker: use your first touch to beat the defender',
+      'Shoot early — you have momentum from the sprint',
+    ],
+    variations: [
+      'Call two numbers for a 2v2',
+      'Add a neutral player who plays with the team that wins the ball',
+    ],
+  },
+  {
+    id: 'possession-grid',
+    name: 'Possession Grid',
+    description:
+      'In a 40×40 area divided into 10×10 grids, two teams play keep away. Passes to players in adjacent grids = 1 point, two grids away = 2 points, three away = 3 points. One-touch doubles the value. Loss of possession = minus 1 point. First to 100 wins. Encourages looking beyond the nearest player.',
+    category: 'passing',
+    minDivision: '14U',
+    phase: 'small-sided-game',
+    duration: 25,
+    players: '8–16',
+    equipment: ['balls', 'cones'],
+    coachingPoints: [
+      'Look for the distant target — that\'s where the points are',
+      'One touch when safe to double your score',
+      'Keep possession as the base — only risk it for big scores',
+    ],
+    variations: [
+      'Reduce grid to 30×30 for more pressure',
+      'No short passes — minimum two grids away to score',
+    ],
+  },
+  {
+    id: 'bumper-cars',
+    name: 'Bumper Cars',
+    description:
+      'Coach moves a ball around while players each with a ball try to kick their ball and hit the coach\'s ball (knocking off parts of the car). Works on passing accuracy, tracking a moving target, and having fun.',
+    category: 'passing',
+    minDivision: '8U',
+    phase: 'warm-up',
+    duration: 8,
+    players: '6–20',
+    equipment: ['balls', 'cones'],
+    coachingPoints: [
+      'Pass with purpose — aim, don\'t just kick',
+      'Track the moving target — reposition before you pass',
+      'First touch toward the coach to stay ready',
+    ],
+    variations: [
+      'Use two coaches for more chaos',
+      'Left foot only round',
+    ],
+  },
+  {
+    id: 'body-part-dribbling',
+    name: 'Body Part Dribbling',
+    description:
+      'Players dribble freely in a grid. When the coach calls out a body part, players must stop the ball with that body part. Progress to specific challenges. Works on ball control, listening, coordination, and creative movement.',
+    category: 'dribbling',
+    minDivision: '8U',
+    phase: 'warm-up',
+    duration: 8,
+    players: '6–20',
+    equipment: ['balls', 'cones'],
+    coachingPoints: [
+      'Keep the ball moving — don\'t stop between calls',
+      'React quickly when you hear the command',
+      'Use all surfaces of the foot',
+    ],
+    variations: [
+      'Add challenge sequences (thigh-shoulder-foot)',
+      'Player who fails a challenge does 5 juggles before re-entering',
+    ],
+  },
+  {
+    id: 'juggling-cooldown',
+    name: 'Juggling Cooldown',
+    description:
+      'Each player with a ball. Practice dropping ball on thigh and catching, then thigh-to-thigh, then thigh-foot-catch. Progress to full juggling with feet and thighs. Works on coordination, balance, and touch.',
+    category: 'cool-down',
+    minDivision: '8U',
+    phase: 'skill-work',
+    duration: 8,
+    players: '1–20',
+    equipment: ['balls'],
+    coachingPoints: [
+      'Relax your touch — soft contact keeps the ball close',
+      'Use your thigh to reset before moving to feet',
+      'Focus on consistency over height',
+    ],
+    variations: [
+      'Add a partner challenge — pass to partner after reaching 5 juggles',
+      'Try alternating foot juggles only',
+    ],
+  },
+  {
+    id: 'end-line-soccer',
+    name: 'End Line Soccer',
+    description:
+      'Two teams in a 15×20 grid with no goalkeeper. A team scores by dribbling or kicking the ball over the opponent\'s end line. Coach serves balls from midfield. Works on directional play, dribbling under pressure, and decision making.',
+    category: 'teamwork',
+    minDivision: '8U',
+    phase: 'small-sided-game',
+    duration: 12,
+    players: '6–16',
+    equipment: ['balls', 'cones'],
+    coachingPoints: [
+      'Drive at the defender to create space',
+      'Support your teammate — give them an out pass',
+      'Keep your head up to find the end line opportunity',
+    ],
+    variations: [
+      'Add a keeper who can use hands',
+      'Must complete 3 passes before scoring',
+    ],
+  },
+  {
+    id: 'four-team-four-goal',
+    name: 'Four Team Four Goal',
+    description:
+      'Four teams each defend one goal on a 60×40 field. A ball is played into the middle and teams try to score on any goal except their own. When a goal is scored, teams rotate clockwise to defend a new goal. Additional balls are added after each goal (max 3 at once). Works on awareness, defensive balance, and quick transitions.',
+    category: 'teamwork',
+    minDivision: '12U',
+    phase: 'small-sided-game',
+    duration: 20,
+    players: '8–16',
+    equipment: ['balls', 'cones', 'goals'],
+    coachingPoints: [
+      'Always know where your goal is — rotate your body to see it',
+      'Transition immediately when possession changes',
+      'Balance defense and attack — not everyone attacks at once',
+    ],
+    variations: [
+      'Remove rotation — teams keep their goal all game',
+      'Bonus: score on two different goals in a row = 3 points',
+    ],
+  },
+  {
+    id: '2v2-corner-game',
+    name: '2v2 Corner Game',
+    description:
+      '2v2 with full-sized goals and a keeper, plus one player in each of the four corners. Field players can play to corners (one touch only) and once a corner ball is played back, a first-time shot is required. Forces hard runs, quick finishes, and combination play under pressure.',
+    category: 'shooting',
+    minDivision: '12U',
+    phase: 'small-sided-game',
+    duration: 20,
+    players: '6–12',
+    equipment: ['balls', 'cones', 'goals'],
+    coachingPoints: [
+      'Make your run before the corner ball comes back',
+      'First-time finish — commit to the shot',
+      'Combine quickly to create the corner opportunity',
+    ],
+    variations: [
+      'Remove the first-time shot requirement once players understand it',
+      'Add a third corner player on each side',
+    ],
+  },
+  {
+    id: 'width-attack-game',
+    name: 'Width Attack Game',
+    description:
+      'Full field game with two real goals plus six small cone goals positioned on the midfield line and sidelines. Points scored by passing through midfield goals (1 pt), serving from the end line through a side goal (1 pt), or scoring in the real goal (3 pts). Teaches width in attack and switching the ball.',
+    category: 'teamwork',
+    minDivision: '14U',
+    phase: 'small-sided-game',
+    duration: 25,
+    players: '10–16',
+    equipment: ['balls', 'cones', 'goals'],
+    coachingPoints: [
+      'Stretch the field — find the wide options before going forward',
+      'Switch the ball quickly to find undefended cone goals',
+      'Look up after every touch to see the full picture',
+    ],
+    variations: [
+      'Remove midfield goals and focus only on side goals and real goals',
+      'All side goals worth 2 points to incentivize width even more',
+    ],
+  },
+  {
+    id: 'end-line-target-game',
+    name: 'End Line Target Game',
+    description:
+      '4v4 plus keepers on a 60×40 field. Two neutral players sit on each offensive end line, limited to one touch. Field players maintain possession until they can find an end line player to create a scoring chance. Works on possession, penetration, and runs into the box.',
+    category: 'teamwork',
+    minDivision: '14U',
+    phase: 'small-sided-game',
+    duration: 25,
+    players: '10–14',
+    equipment: ['balls', 'cones', 'goals'],
+    coachingPoints: [
+      'Be patient in possession — wait for the right moment to penetrate',
+      'Make runs into the box when the end line player receives',
+      'End line player: one touch, play early to the runner',
+    ],
+    variations: [
+      'Give target players two touches',
+      'Require 3 passes before each target player contact',
+    ],
+  },
+  {
+    id: 'middle-goal-game',
+    name: 'Middle Goal Game',
+    description:
+      '6v6 with one or two back-to-back goals placed in the center of the field. Either team can score on either side of the center goal. Rewards vision, field awareness, spacing, and quick transitions. Players naturally spread the field once they realize the goal is in the middle.',
+    category: 'teamwork',
+    minDivision: '12U',
+    phase: 'small-sided-game',
+    duration: 20,
+    players: '8–14',
+    equipment: ['balls', 'cones', 'goals'],
+    coachingPoints: [
+      'Scan constantly — the goal is in the middle, not at the end',
+      'Spread wide to create shooting angles on both sides',
+      'Transition quickly — the center goal is always in range',
+    ],
+    variations: [
+      'Add two central goals for more chaos',
+      'Restrict shooting to outside the box to force combination play',
+    ],
+  },
+  {
+    id: 'target-player-possession',
+    name: 'Target Player Possession',
+    description:
+      'Five offensive players on a circle with two defenders inside, plus one target player in the middle. Outside players maintain possession and try to split defenders to reach the target player. Scoring: 5 consecutive passes = 1 pt, splitting defenders = 1 pt, reaching target player = 2 pts, splitting to target = 3 pts. Rotate defenders every 2 minutes.',
+    category: 'passing',
+    minDivision: '14U',
+    phase: 'small-sided-game',
+    duration: 20,
+    players: '8–12',
+    equipment: ['balls', 'cones'],
+    coachingPoints: [
+      'Be patient — wait for the gap to open before playing through',
+      'Move the defenders with a sequence of passes before splitting',
+      'Target player: show on the half-turn to receive and play quickly',
+    ],
+    variations: [
+      'Reduce defenders to 1 for early success',
+      'Target player is allowed to pass back out before scoring',
+    ],
+  },
+  {
+    id: 'half-field-zone-game',
+    name: 'Half Field Zone Game',
+    description:
+      'Play on half a field with three players in the defensive half and two in the offensive half per team. Players cannot cross midfield. Score by shooting from midfield or finding a forward in the offensive half. Progress by allowing one defender to join the attack after a forward receives the ball.',
+    category: 'teamwork',
+    minDivision: '14U',
+    phase: 'small-sided-game',
+    duration: 20,
+    players: '10–14',
+    equipment: ['balls', 'cones', 'goals'],
+    coachingPoints: [
+      'Midfielders: look to play forward early before shooting',
+      'Forwards: create space and make runs to receive in the box',
+      'Win the ball and transition quickly to your roles',
+    ],
+    variations: [
+      'Allow one defender to push into the attacking half after the forward receives',
+      'Add a second ball to create overloads',
+    ],
+  },
+  {
+    id: '3v3-combination-finish',
+    name: '3v3 Combination Finish',
+    description:
+      'Three players work toward goal in pairs. Player 1 passes to Player 2 who lays it back for Player 3 to shoot. Rotate so every player shoots. Progress to wall pass variations, double passes, and diagonal runs for the finish. Two groups work simultaneously for high repetition.',
+    category: 'shooting',
+    minDivision: '12U',
+    phase: 'skill-work',
+    duration: 15,
+    players: '6–18',
+    equipment: ['balls', 'cones', 'goal'],
+    coachingPoints: [
+      'Lay-off pass must be crisp — give the shooter a clean ball',
+      'Shooter: arrive at the ball with momentum, strike first time',
+      'Vary the combination — wall pass, double pass, diagonal run',
+    ],
+    variations: [
+      'Add a passive goalkeeper',
+      'Require a specific combination only (wall pass, or diagonal run)',
+    ],
+  },
+  {
+    id: 'chip-and-volley-challenge',
+    name: 'Chip and Volley Challenge',
+    description:
+      'Two players 35 yards apart with a 5-yard buffer zone each. Player 1 chips to Player 2\'s chest. Points awarded progressively: ball reaches buffer zone = 1 pt, chest contact = 2 pts, chest then foot before bounce = 3 pts, volleys it back = 4 pts, partner receives volley on chest = 5 pts. Take 10 chips each then switch. Great for aerial control and long passing.',
+    category: 'passing',
+    minDivision: '14U',
+    phase: 'skill-work',
+    duration: 15,
+    players: '2–20',
+    equipment: ['balls', 'cones'],
+    coachingPoints: [
+      'Chip with backspin to make it drop gently for your partner',
+      'Get under the ball early — watch it all the way to your chest',
+      'Cushion the first touch before attempting the volley back',
+    ],
+    variations: [
+      'Partner catches the volley instead of chesting it back',
+      'Move partners to 25 yards for younger players',
+    ],
+  },
+  {
+    id: 'wall-pass-combination',
+    name: 'Wall Pass Combination',
+    description:
+      'Two lines 20 yards apart. Player from Line A passes to Line B and follows. First player in B dummies the ball, second player in B plays it wide to the dummy runner for a wall pass return. Works on passing, dummying, movement, and combination play. Rotate continuously.',
+    category: 'passing',
+    minDivision: '12U',
+    phase: 'warm-up',
+    duration: 10,
+    players: '6–20',
+    equipment: ['balls', 'cones'],
+    coachingPoints: [
+      'Dummy convincingly — sell the touch to the defender',
+      'Wall pass must be firm and into the runner\'s path',
+      'Follow your pass immediately — don\'t wait to see the outcome',
+    ],
+    diagram: 'two-lines',
+    variations: [
+      'Add a passive defender at the dummy position',
+      'Switch to third-man run combination instead of wall pass',
+    ],
+  },
+  {
+    id: 'ball-mastery-cooldown',
+    name: 'Ball Mastery Cooldown',
+    description:
+      'Each player with a ball on a 10-yard line. Use inside then outside of right foot to tap the ball along the line and back. Repeat with the left foot. Progress to alternating inside-outside-inside-outside with both feet. Focus is on quick touches and close control, not speed. Calms the session down while reinforcing touch.',
+    category: 'cool-down',
+    minDivision: '8U',
+    phase: 'skill-work',
+    duration: 8,
+    players: '1–20',
+    equipment: ['balls', 'cones'],
+    coachingPoints: [
+      'Soft touches — feel the ball, don\'t chase it',
+      'Keep the ball on the line — precision over speed',
+      'Alternate feet naturally without looking down',
+    ],
+    variations: [
+      'Use inside-sole-outside pattern for advanced players',
+      'Challenge: complete the sequence without looking at the ball',
+    ],
+  },
+  {
+    id: 'juggling-pairs-cooldown',
+    name: 'Juggling Pairs Cooldown',
+    description:
+      'Players pair up with one ball. Partner A juggles as many times as possible then passes to Partner B using a controlled touch. Partner B juggles and passes back. Progress from thigh-thigh-catch to thigh-foot-catch to continuous juggling. Relaxed pace, players count their personal best. Great to finish any session.',
+    category: 'cool-down',
+    minDivision: '10U',
+    phase: 'skill-work',
+    duration: 8,
+    players: '2–20',
+    equipment: ['balls'],
+    coachingPoints: [
+      'Relax — tension makes juggling harder',
+      'Count out loud to track your personal best',
+      'Pass gently to your partner so they can succeed too',
+    ],
+    variations: [
+      'Set a team target — combine all juggles from both partners',
+      'Add a third player who receives the pass after the juggling sequence',
+    ],
+  },
+  {
+    id: 'passing-circle-cooldown',
+    name: 'Passing Circle Cooldown',
+    description:
+      'Players form a circle with one ball. Pass around the circle calling the name of the person they are passing to. Progress to skipping a player, then two touches only, then one touch. Slow and deliberate — focus on accuracy and communication. A calm way to close the session and reinforce names and passing fundamentals.',
+    category: 'cool-down',
+    minDivision: '8U',
+    phase: 'skill-work',
+    duration: 8,
+    players: '6–20',
+    equipment: ['balls'],
+    coachingPoints: [
+      'Call your teammate\'s name before the pass',
+      'Weight the pass so it arrives comfortably',
+      'Make eye contact with the receiver before releasing the ball',
+    ],
+    variations: [
+      'Skip two players for an advanced passing pattern',
+      'Add a second ball going the opposite direction',
+    ],
+  },
+  {
+    id: 'sole-rolls-stretches-cooldown',
+    name: 'Sole Rolls and Stretches Cooldown',
+    description:
+      'Players each with a ball. Roll the ball with the sole of the right foot slowly side to side, then forward and back. Swap feet. Add gentle standing stretches between each roll sequence: quad stretch, hamstring reach, calf stretch. Coach leads and models each movement. Low intensity — designed to bring heart rate down and end on a relaxed note.',
+    category: 'cool-down',
+    minDivision: '8U',
+    phase: 'skill-work',
+    duration: 8,
+    players: '1–20',
+    equipment: ['balls'],
+    coachingPoints: [
+      'Slow and controlled — this is recovery time',
+      'Hold each stretch for a full breath before releasing',
+      'Keep the sole rolling smoothly, no jerky movements',
+    ],
+    variations: [
+      'Add neck rolls and ankle rotations between sequences',
+      'Players take turns leading the next stretch',
+    ],
+  },
+  {
+    id: 'dribble-and-freeze-cooldown',
+    name: 'Dribble and Freeze Cooldown',
+    description:
+      'Players dribble slowly in a large grid. When the coach calls "freeze", everyone stops the ball with their foot and holds a balance pose on one leg. Coach calls out simple questions — favorite animal, what they learned today — before saying "go" again. Combines light movement, balance work, and reflection to close the session positively.',
+    category: 'cool-down',
+    minDivision: '8U',
+    phase: 'skill-work',
+    duration: 8,
+    players: '6–20',
+    equipment: ['balls', 'cones'],
+    coachingPoints: [
+      'Stop cleanly — sole of the foot, controlled',
+      'Balance on one leg for the full freeze',
+      'Listen for the question and answer when called on',
+    ],
+    variations: [
+      'Ask players to name one thing they want to improve next session',
+      'Players pair up during freeze and share one thing they did well',
+    ],
+  },
+  {
+    id: 'knock-out-improved',
+    name: 'Knock Out (Improved)',
+    description:
+      'All players dribble in a 25×25 grid. Players try to kick other players\' balls out while protecting their own. Unlike traditional knock out — if your ball leaves the grid you do 5 quick toe taps on the ball at the edge and re-enter immediately, so no one sits out. Focus on shielding, dribbling at pressure, and constant movement.',
+    category: 'dribbling',
+    minDivision: '8U',
+    phase: 'small-sided-game',
+    duration: 12,
+    players: '8–20',
+    equipment: ['balls', 'cones'],
+    coachingPoints: [
+      'Shield with your body — keep yourself between the ball and attacker',
+      'Head up — see the whole grid before you attack',
+      'Re-enter fast after your toe taps — don\'t waste time',
+    ],
+    diagram: 'grid-dribble',
+    variations: [
+      'If you knock someone\'s ball out, you get a point',
+      'Left foot only for one round',
+    ],
+  },
+  {
+    id: '4v4-mini-world-cup',
+    name: '4v4 Mini World Cup',
+    description:
+      'Teams of 4 pick a country name. Coach serves balls into the field and teams try to score in one goal with a keeper. Scoring team yells their country name. First team to score steps off; last team on the field loses that round. Play multiple rounds. High energy, lots of shooting, great for ending practice on a fun note.',
+    category: 'shooting',
+    minDivision: '8U',
+    phase: 'small-sided-game',
+    duration: 15,
+    players: '8–20',
+    equipment: ['balls', 'cones', 'goals'],
+    coachingPoints: [
+      'Shoot early — don\'t wait for the perfect chance',
+      'Be brave in front of goal',
+      'Celebrate as a team when you score',
+    ],
+    variations: [
+      'Play 3v3 for smaller groups',
+      'Add penalty kicks if tied after 2 minutes',
+    ],
+  },
+  {
+    id: 'double-shadow-play',
+    name: 'Double Shadow Play',
+    description:
+      'Entire squad on the field with starters in one color and second team in another — both going the same direction. Ball starts with keeper. Each player races their counterpart to the correct position. Coach plays ball to either player at each position. Highlights different decision-making options and builds positional understanding. Stop and discuss when two players make different runs.',
+    category: 'teamwork',
+    minDivision: '14U',
+    phase: 'skill-work',
+    duration: 20,
+    players: '12–22',
+    equipment: ['balls', 'cones', 'goals'],
+    coachingPoints: [
+      'Get to your position before the ball arrives',
+      'Make the decision first — movement is communication',
+      'Discuss when you and your counterpart made different choices',
+    ],
+    variations: [
+      'Add a real defender to create live decision moments',
+      'Remove the counterpart comparison — each team plays independently',
+    ],
+  },
+  {
+    id: 'small-sided-game',
+    name: 'Small-sided Game',
+    description:
+      'Free play in a reduced-size game (3v3 to 6v6 depending on squad size) with real rules for the division. Coach sets up two small goals and lets players play. Pause only for key teaching moments — otherwise let the game breathe. Adjust field size and team numbers to ensure constant action. Best used to apply the skills practiced earlier in the session.',
+    category: 'teamwork',
+    minDivision: '8U',
+    phase: 'small-sided-game',
+    duration: 20,
+    players: '6–16',
+    equipment: ['balls', 'cones', 'goals'],
+    coachingPoints: [
+      'Let the players play — avoid over-coaching',
+      'Pause only for key moments that reinforce the session theme',
+      'Adjust field size if goals are too rare or too frequent',
+    ],
+    variations: [
+      'Condition the game to reinforce the session skill (e.g. must complete 3 passes before shooting)',
+      'Add neutral players to create overloads',
+    ],
+  },
+  {
+    id: 'scrimmage',
+    name: 'Scrimmage',
+    description:
+      'Full free play using the division\'s standard team size and rules — no restrictions, no coach interruptions. Players apply everything from the session in a real game context. Coach observes only. Use standard rules for the division: correct team size, ball size, goalkeeper rules, and no heading for U12 and below. Let them play and enjoy the game.',
+    category: 'teamwork',
+    minDivision: '8U',
+    phase: 'small-sided-game',
+    duration: 25,
+    players: '8–22',
+    equipment: ['balls', 'goals'],
+    coachingPoints: [
+      'No coaching interruptions — observe only',
+      'Apply standard rules for the division',
+      'Note individual and team patterns to address next session',
+    ],
+    variations: [
+      'Play two short games with a short break rather than one long one',
+    ],
+  },
+]

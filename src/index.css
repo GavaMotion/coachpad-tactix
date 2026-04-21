@@ -1,0 +1,105 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Design token palette ──────────────────────────────────────── */
+:root {
+  --bg-primary:       #0d0d1a;
+  --bg-secondary:     #13131f;
+  --bg-panel:         #1a1a2e;
+  --bg-purple:        #2d1b69;
+  --bg-purple-mid:    #3d2080;
+  --bg-purple-light:  #4a2590;
+  --color-green:      #00c853;
+  --color-green-dark: #1a5c2e;
+  --color-green-glow: rgba(0, 200, 83, 0.15);
+  --text-primary:     #ffffff;
+  --text-secondary:   #a0a0c0;
+  --text-muted:       #606080;
+  --border-subtle:    rgba(255,255,255,0.08);
+  --border-purple:    rgba(120,80,255,0.3);
+  --tab-active:       #00c853;
+
+  /* Team branding defaults (overridden by JS when team loads) */
+  --team-primary:     #00c853;
+  --team-secondary:   #00c853;
+  --team-accent:      #00c853;
+  --team-primary-rgb: 0,200,83;
+  --team-primary-20:  rgba(0,200,83,0.20);
+  --team-primary-12:  rgba(0,200,83,0.12);
+}
+
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  /* ── Global dark inputs ──────────────────────────────────────── */
+  input:not([type='color']):not([type='file']):not([type='range']),
+  textarea,
+  select {
+    background-color: var(--bg-panel) !important;
+    color: var(--text-primary) !important;
+    border-color: var(--border-subtle) !important;
+  }
+  input::placeholder,
+  textarea::placeholder {
+    color: var(--text-muted) !important;
+  }
+
+  /* ── Thin green scrollbars ───────────────────────────────────── */
+  ::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--bg-primary);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-green);
+    border-radius: 2px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #00e65e;
+  }
+
+  /* ── Override Tailwind grays to use dark palette ─────────────── */
+  .bg-gray-950 { background-color: var(--bg-primary) !important; }
+  .bg-gray-900 { background-color: var(--bg-secondary) !important; }
+  .bg-gray-800 { background-color: var(--bg-panel) !important; }
+
+  /* border-gray-800/700 → border-subtle */
+  .border-gray-800 { border-color: var(--border-subtle) !important; }
+  .border-gray-700 { border-color: var(--border-subtle) !important; }
+
+  /* text overrides */
+  .text-gray-400 { color: var(--text-secondary) !important; }
+  .text-gray-500 { color: var(--text-muted)     !important; }
+  .text-gray-600 { color: var(--text-muted)     !important; }
+}
+
+@layer utilities {
+  .animate-spin {
+    animation: spin 0.75s linear infinite;
+  }
+
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+  }
+
+  /* Green glow utility */
+  .glow-green {
+    box-shadow: 0 0 12px var(--color-green-glow), 0 0 24px var(--color-green-glow);
+  }
+}
