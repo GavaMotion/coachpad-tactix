@@ -14,12 +14,14 @@ import BrandingFields from './components/Team/BrandingFields'
 // ── Splash screen ────────────────────────────────────────────────
 function SplashScreen({ onDone }) {
   const [fadeOut, setFadeOut] = useState(false)
+  const [imageLoaded, setImageLoaded] = useState(false)
 
   useEffect(() => {
-    const fadeTimer = setTimeout(() => setFadeOut(true), 1700)
-    const doneTimer = setTimeout(() => onDone(), 2200)
+    if (!imageLoaded) return
+    const fadeTimer = setTimeout(() => setFadeOut(true), 2000)
+    const doneTimer = setTimeout(() => onDone(), 2500)
     return () => { clearTimeout(fadeTimer); clearTimeout(doneTimer) }
-  }, [])
+  }, [imageLoaded])
 
   return (
     <div style={{
@@ -32,6 +34,8 @@ function SplashScreen({ onDone }) {
       <img
         src="/coachpad_cover.png"
         alt="CoachPad Tactix"
+        onLoad={() => setImageLoaded(true)}
+        onError={() => onDone()}
         style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }}
       />
     </div>
