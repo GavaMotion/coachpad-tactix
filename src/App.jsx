@@ -24,19 +24,21 @@ function SplashScreen({ onDone }) {
   }, [imageLoaded])
 
   return (
-    <div style={{
-      position: 'fixed', inset: 0, zIndex: 99999,
-      background: '#0d0d1a',
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-      opacity: fadeOut ? 0 : 1,
-      transition: 'opacity 0.5s ease-in-out',
-    }}>
+    <div
+      className="splash-container"
+      style={{
+        zIndex: 99999,
+        background: '#0d0d1a',
+        opacity: fadeOut ? 0 : 1,
+        transition: 'opacity 0.5s ease-in-out',
+      }}
+    >
       <img
         src="/coachpad_cover.png"
         alt="CoachPad Tactix"
         onLoad={() => setImageLoaded(true)}
         onError={() => onDone()}
-        style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }}
+        style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top', display: 'block' }}
       />
     </div>
   )

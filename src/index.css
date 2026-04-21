@@ -2,6 +2,34 @@
 @tailwind components;
 @tailwind utilities;
 
+.splash-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+@media (orientation: landscape) {
+  .splash-container img {
+    object-fit: cover;
+    object-position: center center;
+    width: 100%;
+    height: 100%;
+  }
+}
+
+@media (orientation: portrait) {
+  .splash-container img {
+    object-fit: cover;
+    object-position: center top;
+    width: 100%;
+    height: 100%;
+  }
+}
+
 /* ── Design token palette ──────────────────────────────────────── */
 :root {
   --bg-primary:       #0d0d1a;
