@@ -242,6 +242,87 @@ export default function MyTeamPage({ onSignOut, onCreateTeam, onShowOnboarding }
     setShowModal(true)
   }
 
+  async function handleExportData() {
+    try {
+      addToast('Preparing export…', 'info', 2000)
+      const exportData = {
+        exportDate: new Date().toISOString(),
+        appVersion: APP_VERSION,
+        teams: [],
+      }
+
+      const { data: allTeams } = await supabase
+        .from('teams').select('*').eq('user_id', userId)
+
+      for (const t of allTeams || []) {
+        const teamExport = {
+          name: t.name, division: t.division,
+          color_primary: t.color_primary, color_secondary: t.color_secondary, color_accent: t.color_accent,
+          players: [], game_plans: [], practice_plans: [], strategy_sketches: [],
+        }
+
+        const { data: ps } = await supabase.from('players').select('name, jersey_number, positions').eq('team_id', t.id)
+        teamExport.players = ps || []
+
+        const { data: gps } = await supabase.from('saved_game_plans').select('name, formation_id, quarter_data, created_at').eq('team_id', t.id)
+        teamExport.game_plans = gps || []
+
+        const { data: pps } = await supabase.from('practice_plans').select('name, created_at').eq('team_id', t.id)
+        for (const plan of pps || []) {
+          const { data: drills } = await supabase.from('practice_plan_drills')
+            .select('drill_name, skill_category, duration_minutes, sort_order').eq('plan_id', plan.id).order('sort_order')
+          teamExport.practice_plans.push({ name: plan.name, created_at: plan.created_at, drills: drills || [] })
+        }
+
+        const { data: sketches } = await supabase.from('strategy_sketches')
+          .select('name, my_players, opp_players, arrows, created_at').eq('team_id', t.id)
+        teamExport.strategy_sketches = sketches || []
+
+        exportData.teams.push(teamExport)
+      }
+
+      const { data: customDrills } = await supabase.from('custom_drills')
+        .select('name, description, skill_category, min_age_division, duration_minutes, phase, coaching_points, variations').eq('user_id', userId)
+      exportData.custom_drills = customDrills || []
+
+      const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `coachpad-tactix-backup-${new Date().toISOString().split('T')[0]}.json`
+      document.body.appendChild(a); a.click(); document.body.removeChild(a)
+      URL.revokeObjectURL(url)
+      addToast('Data exported successfully', 'success')
+    } catch (err) {
+      console.error('Export error:', err)
+      addToast('Could not export data — please try again', 'error')
+    }
+  }
+
+  async function handleExportRoster() {
+    try {
+      if (!team?.id) { addToast('No team selected', 'warning'); return }
+      const { data: ps } = await supabase.from('players')
+        .select('name, jersey_number, positions').eq('team_id', team.id).order('jersey_number')
+      if (!ps?.length) { addToast('No players to export', 'warning'); return }
+
+      const headers = ['Jersey Number', 'Name', 'Positions']
+      const rows = ps.map(p => [p.jersey_number, p.name, (p.positions || []).join(', ')])
+      const csv = [headers, ...rows].map(row => row.map(c => `"${c}"`).join(',')).join('\n')
+
+      const blob = new Blob([csv], { type: 'text/csv' })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `${team.name}-roster-${new Date().toISOString().split('T')[0]}.csv`
+      document.body.appendChild(a); a.click(); document.body.removeChild(a)
+      URL.revokeObjectURL(url)
+      addToast('Roster exported as CSV', 'success')
+    } catch {
+      addToast('Could not export roster', 'error')
+    }
+  }
+
   async function handleDeleteAccount() {
     if (deleteConfirmText !== 'DELETE') return
     setIsDeleting(true)
@@ -558,6 +639,33 @@ export default function MyTeamPage({ onSignOut, onCreateTeam, onShowOnboarding }
           <div style={{ color: 'rgba(255,255,255,0.15)', fontSize: 10 }}>
             CoachPad Tactix v{APP_VERSION}
           </div>
+        </div>
+
+        {/* Export buttons */}
+        <div style={{ display: 'flex', gap: 8, marginTop: 8, marginBottom: 16, padding: '0 4px' }}>
+          {[
+            { label: 'Export all data', onClick: handleExportData },
+            { label: 'Export roster CSV', onClick: handleExportRoster },
+          ].map(({ label, onClick }) => (
+            <button
+              key={label}
+              onClick={onClick}
+              aria-label={label}
+              style={{
+                flex: 1, background: 'none', border: '1px solid rgba(255,255,255,0.15)',
+                borderRadius: 8, padding: '10px 8px', color: 'rgba(255,255,255,0.5)',
+                fontSize: 11, cursor: 'pointer', display: 'flex', alignItems: 'center',
+                justifyContent: 'center', gap: 6,
+              }}
+            >
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="7 10 12 15 17 10"/>
+                <line x1="12" y1="15" x2="12" y2="3"/>
+              </svg>
+              {label}
+            </button>
+          ))}
         </div>
       </div>
 
