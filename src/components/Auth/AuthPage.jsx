@@ -46,7 +46,7 @@ export default function AuthPage() {
       const { data, error: signUpError } = await supabase.auth.signUp({
         email,
         password,
-        options: { emailRedirectTo: 'https://squadiq.vercel.app' },
+        options: { emailRedirectTo: 'https://squadiq-coach.vercel.app' },
       })
       setLoading(false)
       if (signUpError) { setError(signUpError.message); return }
@@ -72,7 +72,7 @@ export default function AuthPage() {
     if (!resetEmail) { setResetError('Please enter your email address'); return }
     setResetError('')
     const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
-      redirectTo: 'https://squadiq.vercel.app/reset-password',
+      redirectTo: 'https://squadiq-coach.vercel.app/reset-password',
     })
     if (error) { setResetError(error.message) } else { setResetSent(true); addToast('Reset link sent — check your email', 'success') }
   }
@@ -82,7 +82,7 @@ export default function AuthPage() {
     const { error } = await supabase.auth.resend({
       type: 'signup',
       email,
-      options: { emailRedirectTo: 'https://squadiq.vercel.app' },
+      options: { emailRedirectTo: 'https://squadiq-coach.vercel.app' },
     })
     if (!error) {
       setResendCooldown(60)
