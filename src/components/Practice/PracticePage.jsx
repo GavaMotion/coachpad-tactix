@@ -403,26 +403,14 @@ export default function PracticePage() {
     }))
     if (activePlanId && !String(activePlanId).startsWith('local-') && !String(activePlanId).startsWith('temp-')) {
       const localId = newDrill.id
-      const insertPayload = {
+      supabase.from('practice_plan_drills').insert({
         plan_id: newDrill.plan_id, drill_name: newDrill.drill_name,
         drill_description: newDrill.drill_description,
         skill_category: newDrill.skill_category, duration_minutes: newDrill.duration_minutes,
         sort_order: newDrill.sort_order, is_custom: newDrill.is_custom,
-      }
-      console.log('=== INSERTING DRILL ===')
-      console.log('payload:', JSON.stringify(insertPayload))
-      console.log('activePlanId:', activePlanId)
-      supabase.from('practice_plan_drills')
-        .insert(insertPayload)
-        .select().single()
+      }).select().single()
         .then(({ data, error }) => {
-          console.log('=== DRILL INSERT RESULT ===')
-          console.log('data:', data)
-          console.log('error:', JSON.stringify(error))
-          if (error) {
-            addToast(`Error: ${error.code} - ${error.message} - ${error.details}`, 'error', 10000)
-            return
-          }
+          if (error) { console.error('Drill save error:', error); addToast('Could not save drill', 'error'); return }
           if (data) setAllPlanDrills(prev => ({
             ...prev,
             [activePlanId]: (prev[activePlanId] || []).map(d => d.id === localId ? data : d),
