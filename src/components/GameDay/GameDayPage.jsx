@@ -67,6 +67,10 @@ export default function GameDayPage() {
 
   useEffect(() => { planStatesRef.current = planStates }, [planStates])
   useEffect(() => { viewedQuarterRef.current = viewedQuarter }, [viewedQuarter])
+  // Keep activePlanRef in sync with context — ref is initialized at mount when
+  // activePlanId is still null, so without this sync all scheduleSave() calls
+  // read null and return early, meaning the plan is never written to Supabase.
+  useEffect(() => { if (activePlanId) activePlanRef.current = activePlanId }, [activePlanId])
 
   useEffect(() => {
     return () => {
