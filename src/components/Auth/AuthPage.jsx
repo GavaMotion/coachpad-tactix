@@ -1,70 +1,103 @@
-import { useState } from 'react'
-import { useAuth } from '../../contexts/AuthContext'
+import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
 import PrivacyPolicy from '../Legal/PrivacyPolicy'
 import TermsOfService from '../Legal/TermsOfService'
 
 export default function AuthPage() {
-  const { signIn, signUp } = useAuth()
   const [mode, setMode] = useState('login') // 'login' | 'signup'
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
-  const [message, setMessage] = useState('')
   const [loading, setLoading] = useState(false)
 
+  // Forgot password
   const [showForgotPassword, setShowForgotPassword] = useState(false)
   const [resetEmail, setResetEmail] = useState('')
   const [resetSent, setResetSent] = useState(false)
   const [resetError, setResetError] = useState('')
 
+  // Email verification
+  const [showVerificationMessage, setShowVerificationMessage] = useState(false)
+  const [resendCooldown, setResendCooldown] = useState(0)
+
+  // Legal
   const [showPrivacy, setShowPrivacy] = useState(false)
   const [showTerms,   setShowTerms]   = useState(false)
 
   async function handleSubmit(e) {
     e.preventDefault()
     setError('')
-    setMessage('')
     setLoading(true)
 
-    try {
-      if (mode === 'login') {
-        const { error } = await signIn(email, password)
-        if (error) throw error
-      } else {
-        const { error } = await signUp(email, password)
-        if (error) throw error
-        setMessage('Check your email for a confirmation link!')
-        setEmail('')
-        setPassword('')
+    if (mode === 'signup') {
+      if (password.length < 6) {
+        setError('Password must be at least 6 characters')
+        setLoading(false)
+        return
       }
-    } catch (err) {
-      setError(err.message || 'Something went wrong.')
-    } finally {
+      const { data, error: signUpError } = await supabase.auth.signUp({
+        email,
+        password,
+        options: { emailRedirectTo: 'https://coachpad-tactix.vercel.app' },
+      })
       setLoading(false)
+      if (signUpError) { setError(signUpError.message); return }
+      if (data?.user && !data.user.confirmed_at) {
+        setShowVerificationMessage(true)
+      }
+    } else {
+      const { error: signInError } = await supabase.auth.signInWithPassword({ email, password })
+      setLoading(false)
+      if (signInError) {
+        if (signInError.message.toLowerCase().includes('email not confirmed')) {
+          setShowVerificationMessage(true)
+          setError('Please verify your email before logging in. Check your inbox.')
+        } else {
+          setError(signInError.message)
+        }
+      }
     }
   }
 
   async function handleResetPassword() {
-    if (!resetEmail) {
-      setResetError('Please enter your email address')
-      return
-    }
+    if (!resetEmail) { setResetError('Please enter your email address'); return }
     setResetError('')
     const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
       redirectTo: 'https://coachpad-tactix.vercel.app/reset-password',
     })
-    if (error) {
-      setResetError(error.message)
-    } else {
-      setResetSent(true)
+    if (error) { setResetError(error.message) } else { setResetSent(true) }
+  }
+
+  async function handleResendVerification() {
+    if (resendCooldown > 0) return
+    const { error } = await supabase.auth.resend({
+      type: 'signup',
+      email,
+      options: { emailRedirectTo: 'https://coachpad-tactix.vercel.app' },
+    })
+    if (!error) {
+      setResendCooldown(60)
+      const timer = setInterval(() => {
+        setResendCooldown(prev => {
+          if (prev <= 1) { clearInterval(timer); return 0 }
+          return prev - 1
+        })
+      }, 1000)
     }
+  }
+
+  // ── Shared input style ───────────────────────────────────────────
+  const inputStyle = {
+    background: '#1a1a2e', border: '1px solid rgba(255,255,255,0.15)',
+    borderRadius: 8, padding: '12px 14px', color: '#fff', fontSize: 14,
+    width: '100%', boxSizing: 'border-box', outline: 'none',
   }
 
   return (
     <div className="min-h-screen bg-gray-950 flex flex-col items-center justify-center px-4"
       style={{ background: 'radial-gradient(ellipse at 50% 0%, rgba(0,200,83,0.08) 0%, var(--bg-primary) 60%)' }}>
-      {/* Logo / Header */}
+
+      {/* Logo */}
       <div className="mb-8 text-center">
         <div className="inline-flex items-center justify-center w-16 h-16 rounded-full mb-4"
           style={{ backgroundColor: 'var(--color-green-dark, #1a5c2e)', boxShadow: '0 0 24px rgba(0,200,83,0.3)' }}>
@@ -81,9 +114,50 @@ export default function AuthPage() {
       </div>
 
       {/* Card */}
-      <div className="w-full max-w-sm rounded-2xl shadow-xl p-8" style={{ background: 'var(--bg-panel)', border: '1px solid var(--border-purple)' }}>
+      <div className="w-full max-w-sm rounded-2xl shadow-xl p-8"
+        style={{ background: 'var(--bg-panel)', border: '1px solid var(--border-purple)' }}>
 
-        {showForgotPassword ? (
+        {/* ── Email verification screen ── */}
+        {showVerificationMessage ? (
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20, textAlign: 'center', padding: '8px 0' }}>
+            <div style={{
+              width: 72, height: 72, borderRadius: '50%',
+              background: 'rgba(0,200,83,0.15)', border: '2px solid rgba(0,200,83,0.3)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 32,
+            }}>
+              ✉
+            </div>
+            <div>
+              <div style={{ color: '#fff', fontSize: 18, fontWeight: 700, marginBottom: 8 }}>
+                Check your email
+              </div>
+              <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: 13, lineHeight: 1.7, maxWidth: 280 }}>
+                We sent a confirmation link to{' '}
+                <span style={{ color: '#00c853' }}>{email}</span>.
+                Click the link in the email to activate your account.
+              </div>
+            </div>
+            <button
+              onClick={handleResendVerification}
+              disabled={resendCooldown > 0}
+              style={{
+                background: 'none', border: '1px solid rgba(255,255,255,0.2)',
+                borderRadius: 8, padding: '10px 20px',
+                color: resendCooldown > 0 ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.7)',
+                fontSize: 13, cursor: resendCooldown > 0 ? 'default' : 'pointer',
+              }}
+            >
+              {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : 'Resend confirmation email'}
+            </button>
+            <span
+              onClick={() => { setShowVerificationMessage(false); setEmail(''); setPassword(''); setError('') }}
+              style={{ color: 'rgba(255,255,255,0.3)', fontSize: 12, cursor: 'pointer', textDecoration: 'underline' }}
+            >
+              Back to login
+            </span>
+          </div>
+
+        ) : showForgotPassword ? (
           /* ── Forgot password form ── */
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             <div style={{ color: '#fff', fontSize: 16, fontWeight: 600 }}>Reset your password</div>
@@ -95,17 +169,11 @@ export default function AuthPage() {
               placeholder="Your email address"
               value={resetEmail}
               onChange={e => setResetEmail(e.target.value)}
-              style={{
-                background: '#1a1a2e', border: '1px solid rgba(255,255,255,0.15)',
-                borderRadius: 8, padding: '12px 14px', color: '#fff', fontSize: 14, width: '100%',
-                boxSizing: 'border-box', outline: 'none',
-              }}
+              style={inputStyle}
               onFocus={e => (e.target.style.borderColor = '#00c853')}
               onBlur={e => (e.target.style.borderColor = 'rgba(255,255,255,0.15)')}
             />
-            {resetError && (
-              <div style={{ color: '#f87171', fontSize: 12 }}>{resetError}</div>
-            )}
+            {resetError && <div style={{ color: '#f87171', fontSize: 12 }}>{resetError}</div>}
             {resetSent ? (
               <div style={{
                 background: 'rgba(0,200,83,0.1)', border: '1px solid rgba(0,200,83,0.3)',
@@ -116,24 +184,19 @@ export default function AuthPage() {
             ) : (
               <button
                 onClick={handleResetPassword}
-                style={{
-                  background: '#00c853', color: '#fff', border: 'none', borderRadius: 8,
-                  padding: '12px', fontSize: 14, fontWeight: 600, cursor: 'pointer', width: '100%',
-                }}
+                style={{ background: '#00c853', color: '#fff', border: 'none', borderRadius: 8, padding: '12px', fontSize: 14, fontWeight: 600, cursor: 'pointer', width: '100%' }}
               >
                 Send reset link
               </button>
             )}
             <span
               onClick={() => { setShowForgotPassword(false); setResetSent(false); setResetError('') }}
-              style={{
-                color: 'rgba(255,255,255,0.4)', fontSize: 12, cursor: 'pointer',
-                textAlign: 'center', textDecoration: 'underline',
-              }}
+              style={{ color: 'rgba(255,255,255,0.4)', fontSize: 12, cursor: 'pointer', textAlign: 'center', textDecoration: 'underline' }}
             >
               Back to login
             </span>
           </div>
+
         ) : (
           /* ── Login / Signup form ── */
           <>
@@ -145,9 +208,7 @@ export default function AuthPage() {
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-1">Email</label>
                 <input
-                  type="email"
-                  required
-                  value={email}
+                  type="email" required value={email}
                   onChange={e => setEmail(e.target.value)}
                   placeholder="coach@example.com"
                   className="w-full px-4 py-2.5 rounded-lg bg-gray-800 border border-gray-700 text-white placeholder-gray-500 focus:outline-none transition"
@@ -155,13 +216,10 @@ export default function AuthPage() {
                   onBlur={e => (e.target.style.boxShadow = '')}
                 />
               </div>
-
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-1">Password</label>
                 <input
-                  type="password"
-                  required
-                  value={password}
+                  type="password" required value={password}
                   onChange={e => setPassword(e.target.value)}
                   placeholder="••••••••"
                   className="w-full px-4 py-2.5 rounded-lg bg-gray-800 border border-gray-700 text-white placeholder-gray-500 focus:outline-none transition"
@@ -172,10 +230,7 @@ export default function AuthPage() {
                   <div style={{ textAlign: 'right', marginTop: 4 }}>
                     <span
                       onClick={() => { setShowForgotPassword(true); setResetEmail(email) }}
-                      style={{
-                        color: 'rgba(255,255,255,0.4)', fontSize: 12,
-                        cursor: 'pointer', textDecoration: 'underline',
-                      }}
+                      style={{ color: 'rgba(255,255,255,0.4)', fontSize: 12, cursor: 'pointer', textDecoration: 'underline' }}
                     >
                       Forgot password?
                     </span>
@@ -189,15 +244,8 @@ export default function AuthPage() {
                 </div>
               )}
 
-              {message && (
-                <div className="text-green-400 text-sm bg-green-900/30 border border-green-800 rounded-lg px-3 py-2">
-                  {message}
-                </div>
-              )}
-
               <button
-                type="submit"
-                disabled={loading}
+                type="submit" disabled={loading}
                 className="w-full py-2.5 rounded-lg font-semibold text-white transition-opacity disabled:opacity-60"
                 style={{ backgroundColor: 'var(--color-green, #00c853)' }}
                 onMouseEnter={e => !loading && (e.target.style.opacity = '0.85')}
@@ -210,7 +258,7 @@ export default function AuthPage() {
             <p className="mt-6 text-center text-sm text-gray-400">
               {mode === 'login' ? "Don't have an account? " : 'Already have an account? '}
               <button
-                onClick={() => { setMode(mode === 'login' ? 'signup' : 'login'); setError(''); setMessage('') }}
+                onClick={() => { setMode(mode === 'login' ? 'signup' : 'login'); setError('') }}
                 className="font-medium underline"
                 style={{ color: 'var(--color-green, #00c853)' }}
               >
@@ -220,17 +268,11 @@ export default function AuthPage() {
 
             <div style={{ textAlign: 'center', marginTop: 16, fontSize: 11, color: 'rgba(255,255,255,0.3)' }}>
               By signing up you agree to our{' '}
-              <span
-                onClick={() => setShowTerms(true)}
-                style={{ color: 'rgba(255,255,255,0.5)', cursor: 'pointer', textDecoration: 'underline' }}
-              >
+              <span onClick={() => setShowTerms(true)} style={{ color: 'rgba(255,255,255,0.5)', cursor: 'pointer', textDecoration: 'underline' }}>
                 Terms of Service
               </span>
               {' '}and{' '}
-              <span
-                onClick={() => setShowPrivacy(true)}
-                style={{ color: 'rgba(255,255,255,0.5)', cursor: 'pointer', textDecoration: 'underline' }}
-              >
+              <span onClick={() => setShowPrivacy(true)} style={{ color: 'rgba(255,255,255,0.5)', cursor: 'pointer', textDecoration: 'underline' }}>
                 Privacy Policy
               </span>
             </div>
