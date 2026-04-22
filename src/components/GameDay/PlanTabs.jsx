@@ -110,6 +110,7 @@ function PlanTab({ plan, isActive, isSaving, compact, onSelect, onDuplicate, onR
       {/* ── ✕ delete button — always visible ── */}
       <button
         onClick={e => { e.stopPropagation(); onRequestDelete(plan.id) }}
+        aria-label={`Delete plan "${plan.name}"`}
         style={{
           width:      18,
           display:    'flex',
@@ -257,6 +258,7 @@ export default function PlanTabs({
         {/* New plan (+) button */}
         <button
           onClick={onCreate}
+          aria-label="Add new plan"
           style={{
             flexShrink: 0,
             width:      38,

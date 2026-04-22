@@ -11,6 +11,7 @@ export default function FormationPicker({ formations, selectedId, onChange }) {
     <select
       value={selectedId || ''}
       onChange={e => onChange(e.target.value)}
+      aria-label="Select formation"
       className="text-xs rounded px-2 py-1 cursor-pointer transition"
       style={{
         background: '#1f2937',

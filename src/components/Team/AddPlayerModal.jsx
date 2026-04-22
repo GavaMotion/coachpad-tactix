@@ -38,7 +38,7 @@ export default function AddPlayerModal({ onSave, onClose, initial }) {
           <h3 className="text-lg font-bold text-white">
             {initial ? 'Edit Player' : 'Add Player'}
           </h3>
-          <button onClick={onClose} className="text-gray-400 hover:text-white transition text-2xl leading-none">&times;</button>
+          <button onClick={onClose} aria-label="Close" className="text-gray-400 hover:text-white transition text-2xl leading-none">&times;</button>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">

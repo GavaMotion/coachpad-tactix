@@ -133,6 +133,10 @@ export default function QuarterPlanGrid({
                     <button
                       onClick={() => !locked && onToggle(pid, q)}
                       disabled={locked}
+                      aria-label={locked
+                        ? isOn ? `${player.name} played Q${q}` : `${player.name} did not play Q${q}`
+                        : isOn ? `Remove ${player.name} from Q${q}` : `Add ${player.name} to Q${q}`}
+                      aria-pressed={isOn}
                       className="w-7 h-7 rounded-md flex items-center justify-center transition-all"
                       style={{
                         background: isOn
@@ -178,6 +182,7 @@ export default function QuarterPlanGrid({
                 <button
                   onClick={() => onToggleAbsent(pid)}
                   className="w-6 h-6 rounded flex items-center justify-center transition text-gray-600 hover:text-amber-400 hover:bg-amber-900/30"
+                  aria-label={`Mark ${player.name} as absent`}
                   title="Mark absent"
                 >
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
@@ -229,6 +234,7 @@ export default function QuarterPlanGrid({
                   <button
                     onClick={() => onToggleAbsent(player.id)}
                     className="w-6 h-6 rounded flex items-center justify-center transition text-green-700 hover:text-green-400 hover:bg-green-900/30"
+                    aria-label={`Mark ${player.name} as present`}
                     title="Mark present"
                     style={{ opacity: 1 }}
                   >

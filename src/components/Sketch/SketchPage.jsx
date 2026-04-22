@@ -903,6 +903,7 @@ export default function SketchPage() {
         <button
           onClick={undo}
           disabled={history.length === 0}
+          aria-label="Undo"
           title="Undo (Ctrl+Z)"
           style={{
             height: 28, padding: '0 10px', borderRadius: 6, fontSize: 16,
@@ -915,6 +916,7 @@ export default function SketchPage() {
         <button
           onClick={redo}
           disabled={future.length === 0}
+          aria-label="Redo"
           title="Redo (Ctrl+Y)"
           style={{
             height: 28, padding: '0 10px', borderRadius: 6, fontSize: 16,

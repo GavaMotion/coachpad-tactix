@@ -374,6 +374,8 @@ function TabBar({ active, onChange }) {
           <button
             key={tab.id}
             onClick={() => onChange(tab.id)}
+            aria-label={`${tab.label} tab`}
+            aria-pressed={isActive}
             style={{
               flex: 1, display: 'flex', flexDirection: 'column',
               alignItems: 'center', justifyContent: 'center',
@@ -484,6 +486,7 @@ function AppContent({ tab, setTab, onSignOut, onShowOnboarding }) {
             </button>
             <button
               onClick={() => setShowInstallBanner(false)}
+              aria-label="Dismiss install banner"
               style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.4)', fontSize: 18, cursor: 'pointer', padding: '0 4px', lineHeight: 1 }}
             >
               ✕

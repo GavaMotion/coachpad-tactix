@@ -337,6 +337,8 @@ function DrillPickerRow({ drill, isFavorite, onToggleFavorite, onAdd, onSelect, 
       <button
         onPointerDown={e => e.stopPropagation()}
         onClick={() => onToggleFavorite(drill.name)}
+        aria-label={isFavorite ? `Remove ${drill.name} from favorites` : `Add ${drill.name} to favorites`}
+        aria-pressed={isFavorite}
         style={{
           ...iconBtnStyle,
           color: isFavorite ? '#EF9F27' : (isMobile ? 'rgba(255,255,255,0.6)' : '#4b5563'),
