@@ -218,25 +218,28 @@ export default function GameDayPage() {
     if (!planId || String(planId).startsWith('local-')) return
     const state = planStatesRef.current[planId]
     if (!state) return
+    const plan = plans.find(p => p.id === planId)
+    const formationId = plan?.formation_id || state?.formationId || getDefaultFormation(teamRef.current?.division || '')?.id
     const planData = {
       id:             planId,
       team_id:        teamIdRef.current,
       quarter_data:   planStateToQuarterData(state),
       absent_players: [...(state.outAllIds || new Set())],
+      formation_id:   formationId,
       updated_at:     new Date().toISOString(),
     }
     setSaving(true)
     try {
       const { ok, queued } = await saveWithOfflineSupport('saved_game_plans', 'upsert', planData, 'id', planId)
       if (queued)     addToast('Offline — game plan queued', 'warning', 2000)
-      else if (ok)    addToast('Game plan saved', 'success', 2000)
+      else if (ok)    addToast('Game plan saved ✓', 'success', 2000)
       else            throw new Error('save failed')
     } catch {
       addToast('Could not save game plan — changes may be lost', 'error')
     } finally {
       setSaving(false)
     }
-  }, [addToast, saveWithOfflineSupport, teamIdRef])
+  }, [plans, addToast, saveWithOfflineSupport, teamIdRef, teamRef])
 
   // ─── Switch plan ──────────────────────────────────────────────
   function switchPlan(planId) {
