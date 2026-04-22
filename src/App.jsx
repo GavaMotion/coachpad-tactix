@@ -563,6 +563,7 @@ function AppContent({ tab, setTab, onSignOut, onShowOnboarding }) {
 // ── Root ─────────────────────────────────────────────────────────
 export default function App() {
   const { session, signOut } = useAuth()
+  const { addToast } = useToast()
   const [tab, setTab] = useState('team')
   const [showSplash, setShowSplash] = useState(() => {
     const seen = sessionStorage.getItem('splashShown')
@@ -574,6 +575,73 @@ export default function App() {
   const [confirmPassword,   setConfirmPassword]   = useState('')
   const [passwordError,     setPasswordError]     = useState('')
   const [showOnboarding,    setShowOnboarding]    = useState(false)
+  const [showSessionExpired, setShowSessionExpired] = useState(false)
+
+  // Refs to distinguish manual sign-out from session expiry
+  const isManualSignOutRef   = useRef(false)
+  const wasAuthenticatedRef  = useRef(false)
+
+  // Track when a real session is established
+  useEffect(() => {
+    if (session) {
+      wasAuthenticatedRef.current = true
+      isManualSignOutRef.current  = false  // reset on fresh login
+    }
+  }, [session])
+
+  // Secondary auth-state listener — detect unexpected sign-outs
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (event === 'SIGNED_OUT' && wasAuthenticatedRef.current && !isManualSignOutRef.current) {
+        setShowSessionExpired(true)
+      }
+      if (event === 'TOKEN_REFRESHED') {
+        setShowSessionExpired(false)
+      }
+    })
+    return () => subscription.unsubscribe()
+  }, [])
+
+  // Session check when the app regains focus or becomes visible
+  useEffect(() => {
+    async function checkSession() {
+      if (!wasAuthenticatedRef.current) return
+      const { data: { session }, error } = await supabase.auth.getSession()
+      if (error || !session) {
+        addToast('Your session expired — please log in again', 'warning', 5000)
+        setShowSessionExpired(true)
+      }
+    }
+    function onVisibilityChange() {
+      if (document.visibilityState === 'visible') checkSession()
+    }
+    window.addEventListener('focus', checkSession)
+    document.addEventListener('visibilitychange', onVisibilityChange)
+    return () => {
+      window.removeEventListener('focus', checkSession)
+      document.removeEventListener('visibilitychange', onVisibilityChange)
+    }
+  }, [addToast])
+
+  // Proactive token refresh every 30 minutes
+  useEffect(() => {
+    if (!session) return
+    const refreshInterval = setInterval(async () => {
+      const { error } = await supabase.auth.refreshSession()
+      if (error) {
+        console.log('Could not refresh session:', error.message)
+        setShowSessionExpired(true)
+      }
+    }, 30 * 60 * 1000)
+    return () => clearInterval(refreshInterval)
+  }, [session])
+
+  // Custom 'session-expired' event (dispatched by Supabase 401 interceptors)
+  useEffect(() => {
+    function handleSessionExpired() { setShowSessionExpired(true) }
+    window.addEventListener('session-expired', handleSessionExpired)
+    return () => window.removeEventListener('session-expired', handleSessionExpired)
+  }, [])
 
   useEffect(() => {
     Object.entries(theme).forEach(([key, value]) => {
@@ -611,6 +679,12 @@ export default function App() {
     }
   }, [session])
 
+  function handleSignOut() {
+    isManualSignOutRef.current = true
+    setShowSessionExpired(false)
+    signOut()
+  }
+
   async function handleUpdatePassword() {
     if (newPassword !== confirmPassword) {
       setPasswordError('Passwords do not match')
@@ -642,74 +716,131 @@ export default function App() {
     )
   }
 
-  if (!session) return <AuthPage />
-
   return (
     <>
-      {showSplash && <SplashScreen onDone={() => setShowSplash(false)} />}
-      <div style={{
-        opacity: showSplash ? 0 : 1,
-        transition: 'opacity 0.3s ease-in',
-        visibility: showSplash ? 'hidden' : 'visible',
-      }}>
-        <AppProvider userId={session.user.id}>
-          <AppContent tab={tab} setTab={setTab} onSignOut={signOut} onShowOnboarding={() => setShowOnboarding(true)} />
-        </AppProvider>
-      </div>
-
-      {!showSplash && showOnboarding && (
-        <Onboarding onComplete={() => setShowOnboarding(false)} />
-      )}
-
-      {showResetPassword && (
+      {/* ── Session expired overlay (sits above everything) ── */}
+      {showSessionExpired && (
         <div style={{
-          position: 'fixed', inset: 0, background: '#0d0d1a',
+          position: 'fixed', inset: 0,
+          background: 'rgba(0,0,0,0.85)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          padding: 24, zIndex: 99999,
+          zIndex: 99999, padding: 24,
         }}>
-          <div style={{ width: '100%', maxWidth: 360, display: 'flex', flexDirection: 'column', gap: 16 }}>
-            <div style={{ color: '#fff', fontSize: 20, fontWeight: 700 }}>Set new password</div>
-            <input
-              type="password"
-              placeholder="New password"
-              value={newPassword}
-              onChange={e => setNewPassword(e.target.value)}
-              style={{
-                background: '#1a1a2e', border: '1px solid rgba(255,255,255,0.15)',
-                borderRadius: 8, padding: '12px 14px', color: '#fff', fontSize: 14,
-                width: '100%', boxSizing: 'border-box', outline: 'none',
-              }}
-              onFocus={e => (e.target.style.borderColor = '#00c853')}
-              onBlur={e => (e.target.style.borderColor = 'rgba(255,255,255,0.15)')}
-            />
-            <input
-              type="password"
-              placeholder="Confirm new password"
-              value={confirmPassword}
-              onChange={e => setConfirmPassword(e.target.value)}
-              style={{
-                background: '#1a1a2e', border: '1px solid rgba(255,255,255,0.15)',
-                borderRadius: 8, padding: '12px 14px', color: '#fff', fontSize: 14,
-                width: '100%', boxSizing: 'border-box', outline: 'none',
-              }}
-              onFocus={e => (e.target.style.borderColor = '#00c853')}
-              onBlur={e => (e.target.style.borderColor = 'rgba(255,255,255,0.15)')}
-            />
-            {passwordError && (
-              <div style={{ color: '#f87171', fontSize: 12 }}>{passwordError}</div>
-            )}
+          <div style={{
+            background: '#1a1a2e',
+            border: '1px solid rgba(255,255,255,0.1)',
+            borderRadius: 20,
+            padding: 32,
+            width: '100%',
+            maxWidth: 360,
+            textAlign: 'center',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: 16,
+          }}>
+            <div style={{ fontSize: 48 }}>⏱</div>
+            <div style={{ color: '#fff', fontSize: 18, fontWeight: 700 }}>
+              Session expired
+            </div>
+            <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: 13, lineHeight: 1.7 }}>
+              You have been logged out due to inactivity. Please log in again to continue.
+            </div>
             <button
-              onClick={handleUpdatePassword}
+              onClick={() => {
+                setShowSessionExpired(false)
+                isManualSignOutRef.current = true
+                signOut()
+              }}
               style={{
-                background: '#00c853', color: '#fff', border: 'none',
-                borderRadius: 8, padding: '12px', fontSize: 14,
-                fontWeight: 600, cursor: 'pointer', width: '100%',
+                background: '#00c853',
+                color: '#fff',
+                border: 'none',
+                borderRadius: 12,
+                padding: '14px 32px',
+                fontSize: 15,
+                fontWeight: 700,
+                cursor: 'pointer',
+                width: '100%',
               }}
             >
-              Update password
+              Log in again
             </button>
           </div>
         </div>
+      )}
+
+      {/* ── Main app or auth page ── */}
+      {!session ? (
+        <AuthPage />
+      ) : (
+        <>
+          {showSplash && <SplashScreen onDone={() => setShowSplash(false)} />}
+          <div style={{
+            opacity: showSplash ? 0 : 1,
+            transition: 'opacity 0.3s ease-in',
+            visibility: showSplash ? 'hidden' : 'visible',
+          }}>
+            <AppProvider userId={session.user.id}>
+              <AppContent tab={tab} setTab={setTab} onSignOut={handleSignOut} onShowOnboarding={() => setShowOnboarding(true)} />
+            </AppProvider>
+          </div>
+
+          {!showSplash && showOnboarding && (
+            <Onboarding onComplete={() => setShowOnboarding(false)} />
+          )}
+
+          {showResetPassword && (
+            <div style={{
+              position: 'fixed', inset: 0, background: '#0d0d1a',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              padding: 24, zIndex: 99999,
+            }}>
+              <div style={{ width: '100%', maxWidth: 360, display: 'flex', flexDirection: 'column', gap: 16 }}>
+                <div style={{ color: '#fff', fontSize: 20, fontWeight: 700 }}>Set new password</div>
+                <input
+                  type="password"
+                  placeholder="New password"
+                  value={newPassword}
+                  onChange={e => setNewPassword(e.target.value)}
+                  style={{
+                    background: '#1a1a2e', border: '1px solid rgba(255,255,255,0.15)',
+                    borderRadius: 8, padding: '12px 14px', color: '#fff', fontSize: 14,
+                    width: '100%', boxSizing: 'border-box', outline: 'none',
+                  }}
+                  onFocus={e => (e.target.style.borderColor = '#00c853')}
+                  onBlur={e => (e.target.style.borderColor = 'rgba(255,255,255,0.15)')}
+                />
+                <input
+                  type="password"
+                  placeholder="Confirm new password"
+                  value={confirmPassword}
+                  onChange={e => setConfirmPassword(e.target.value)}
+                  style={{
+                    background: '#1a1a2e', border: '1px solid rgba(255,255,255,0.15)',
+                    borderRadius: 8, padding: '12px 14px', color: '#fff', fontSize: 14,
+                    width: '100%', boxSizing: 'border-box', outline: 'none',
+                  }}
+                  onFocus={e => (e.target.style.borderColor = '#00c853')}
+                  onBlur={e => (e.target.style.borderColor = 'rgba(255,255,255,0.15)')}
+                />
+                {passwordError && (
+                  <div style={{ color: '#f87171', fontSize: 12 }}>{passwordError}</div>
+                )}
+                <button
+                  onClick={handleUpdatePassword}
+                  style={{
+                    background: '#00c853', color: '#fff', border: 'none',
+                    borderRadius: 8, padding: '12px', fontSize: 14,
+                    fontWeight: 600, cursor: 'pointer', width: '100%',
+                  }}
+                >
+                  Update password
+                </button>
+              </div>
+            </div>
+          )}
+        </>
       )}
     </>
   )
