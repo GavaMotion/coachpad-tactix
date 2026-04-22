@@ -49,7 +49,7 @@ function DeleteTeamDialog({ teamName, onConfirm, onCancel }) {
 }
 
 // ── Main page ─────────────────────────────────────────────────────
-export default function MyTeamPage({ onSignOut }) {
+export default function MyTeamPage({ onSignOut, onCreateTeam }) {
   const {
     teams,     setTeams,
     team,      setTeam,
@@ -105,9 +105,36 @@ export default function MyTeamPage({ onSignOut }) {
 
   if (dataLoaded && !team) {
     return (
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'rgba(255,255,255,0.4)', fontSize: 14, flexDirection: 'column', gap: 8 }}>
-        <div>No team found</div>
-        <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.25)' }}>Tap the team switcher above to create one</div>
+      <div style={{
+        display: 'flex', flexDirection: 'column', alignItems: 'center',
+        justifyContent: 'center', height: '100%', padding: 32,
+        textAlign: 'center', gap: 20,
+      }}>
+        <div style={{
+          width: 80, height: 80, borderRadius: '50%',
+          background: 'rgba(0,200,83,0.15)', border: '2px solid rgba(0,200,83,0.3)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 36,
+        }}>
+          ⚽
+        </div>
+        <div>
+          <div style={{ color: '#fff', fontSize: 20, fontWeight: 700, marginBottom: 8 }}>
+            No teams yet
+          </div>
+          <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: 14, lineHeight: 1.6, maxWidth: 280 }}>
+            Create a team to get started. Add your players, set your formation and start planning.
+          </div>
+        </div>
+        <button
+          onClick={onCreateTeam}
+          style={{
+            background: '#00c853', color: '#fff', border: 'none', borderRadius: 12,
+            padding: '14px 32px', fontSize: 16, fontWeight: 700, cursor: 'pointer',
+            width: '100%', maxWidth: 280,
+          }}
+        >
+          + Create my first team
+        </button>
       </div>
     )
   }
@@ -208,6 +235,20 @@ export default function MyTeamPage({ onSignOut }) {
   return (
     <div className="flex-1 overflow-y-auto bg-gray-950 pb-6">
       <div className="max-w-lg mx-auto px-4 pt-6 space-y-6">
+
+        {/* My Team header with + New team button */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <span style={{ color: '#fff', fontSize: 18, fontWeight: 700 }}>My Team</span>
+          <button
+            onClick={onCreateTeam}
+            style={{
+              background: '#00c853', color: '#fff', border: 'none', borderRadius: 8,
+              padding: '8px 16px', fontSize: 13, fontWeight: 600, cursor: 'pointer',
+            }}
+          >
+            + New team
+          </button>
+        </div>
 
         {error && (
           <div className="text-red-400 text-sm bg-red-900/30 border border-red-800 rounded-lg px-4 py-3">

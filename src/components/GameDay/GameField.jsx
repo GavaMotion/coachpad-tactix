@@ -63,8 +63,11 @@ function PlayerChip({ player, fromSlot, sizePct, chipColor, onDragStart, isDragg
 // ── Droppable slot ───────────────────────────────────────────────
 function Slot({ slot, slotSizePct, player, zone, onDragStart, draggingPlayerId, hoverSlotId }) {
   const colors = slotColors[zone] || slotColors.FWD
-  const isOver    = hoverSlotId === slot.id
+  const isOver     = hoverSlotId === slot.id
   const isDragging = !!player && player.id === draggingPlayerId
+  const isMobile   = window.innerWidth < 768
+  const hitArea    = isMobile ? 90 : 80
+  const visualSize = player ? 52 : 48
 
   return (
     <div
@@ -73,22 +76,26 @@ function Slot({ slot, slotSizePct, player, zone, onDragStart, draggingPlayerId, 
         position:   'absolute',
         left:       `${slot.x}%`,
         top:        `${slot.y}%`,
-        width:      `${slotSizePct}%`,
-        aspectRatio:'1',
+        width:      hitArea,
+        height:     hitArea,
         transform:  'translate(-50%,-50%)',
-        overflow:   'visible',
+        display:    'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
         zIndex:     3,
       }}
     >
       {player ? (
-        /* Filled slot */
+        /* Filled slot — visual only, centered inside hit area */
         <div style={{
-          position:    'absolute',
-          inset:       0,
+          position:    'relative',
+          width:       visualSize,
+          height:      visualSize,
           borderRadius:'50%',
           border:      `2px solid ${isOver ? '#fff' : theme.slotFilledBorder}`,
           boxShadow:   theme.slotFilledShadow,
           overflow:    'hidden',
+          flexShrink:  0,
         }}>
           <PlayerChip
             player={player}
@@ -100,9 +107,10 @@ function Slot({ slot, slotSizePct, player, zone, onDragStart, draggingPlayerId, 
           />
         </div>
       ) : (
-        /* Empty slot */
+        /* Empty slot — visual only, centered inside hit area */
         <div style={{
-          position:      'absolute', inset: 0,
+          width:         visualSize,
+          height:        visualSize,
           borderRadius:  '50%',
           border:        `2px dashed ${isOver ? '#fff' : colors.border}`,
           background:    isOver ? 'rgba(255,255,255,0.12)' : theme.slotFill,
@@ -110,6 +118,7 @@ function Slot({ slot, slotSizePct, player, zone, onDragStart, draggingPlayerId, 
           alignItems:    'center',
           justifyContent:'center',
           transition:    'border-color 0.12s, background 0.12s',
+          flexShrink:    0,
         }}>
           <span style={{
             color:      isOver ? '#fff' : theme.slotText,

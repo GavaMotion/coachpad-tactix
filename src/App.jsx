@@ -405,7 +405,9 @@ const isInStandalone = window.matchMedia('(display-mode: standalone)').matches
 
 // ── Inner content (rendered inside AppProvider) ──────────────────
 function AppContent({ tab, setTab, onSignOut }) {
+  const { createTeam } = useApp()
   const [isWide, setIsWide] = useState(() => typeof window !== 'undefined' && window.innerWidth >= 768)
+  const [showNewTeam, setShowNewTeam] = useState(false)
 
   // Android install prompt
   const [installPrompt,     setInstallPrompt]     = useState(null)
@@ -457,7 +459,7 @@ function AppContent({ tab, setTab, onSignOut }) {
     <div className="flex flex-col bg-gray-950" style={{ height: '100dvh', overflow: 'hidden' }}>
       {isWide && <AppHeader onSignOut={onSignOut} />}
       <div style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-        {tab === 'team'     && <MyTeamPage onSignOut={isWide ? undefined : onSignOut} />}
+        {tab === 'team'     && <MyTeamPage onSignOut={isWide ? undefined : onSignOut} onCreateTeam={() => setShowNewTeam(true)} />}
         {tab === 'lineup'   && <GameDayPage />}
         {tab === 'sketch'   && <SketchPage />}
         {tab === 'practice' && <PracticePage />}
@@ -527,6 +529,16 @@ function AppContent({ tab, setTab, onSignOut }) {
         }}>
           Created by Gava Motion
         </div>
+      )}
+
+      {showNewTeam && (
+        <NewTeamModal
+          onSave={async (name, division, branding) => {
+            await createTeam(name, division, branding)
+            setShowNewTeam(false)
+          }}
+          onCancel={() => setShowNewTeam(false)}
+        />
       )}
     </div>
   )
