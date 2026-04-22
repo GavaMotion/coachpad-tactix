@@ -553,6 +553,10 @@ export default function App() {
     if (!seen) { sessionStorage.setItem('splashShown', 'true'); return true }
     return false
   })
+  const [showResetPassword, setShowResetPassword] = useState(false)
+  const [newPassword,       setNewPassword]       = useState('')
+  const [confirmPassword,   setConfirmPassword]   = useState('')
+  const [passwordError,     setPasswordError]     = useState('')
 
   useEffect(() => {
     Object.entries(theme).forEach(([key, value]) => {
@@ -568,6 +572,37 @@ export default function App() {
       caches.keys().then(names => names.forEach(name => caches.delete(name)))
     }
   }, [])
+
+  useEffect(() => {
+    const hashParams = new URLSearchParams(window.location.hash.substring(1))
+    const accessToken = hashParams.get('access_token')
+    const type = hashParams.get('type')
+    if (type === 'recovery' && accessToken) {
+      setShowResetPassword(true)
+    }
+  }, [])
+
+  async function handleUpdatePassword() {
+    if (newPassword !== confirmPassword) {
+      setPasswordError('Passwords do not match')
+      return
+    }
+    if (newPassword.length < 6) {
+      setPasswordError('Password must be at least 6 characters')
+      return
+    }
+    const { error } = await supabase.auth.updateUser({ password: newPassword })
+    if (error) {
+      setPasswordError(error.message)
+    } else {
+      setShowResetPassword(false)
+      setPasswordError('')
+      setNewPassword('')
+      setConfirmPassword('')
+      window.location.hash = ''
+      alert('Password updated successfully!')
+    }
+  }
 
   if (session === undefined) {
     return (
@@ -592,6 +627,57 @@ export default function App() {
           <AppContent tab={tab} setTab={setTab} onSignOut={signOut} />
         </AppProvider>
       </div>
+
+      {showResetPassword && (
+        <div style={{
+          position: 'fixed', inset: 0, background: '#0d0d1a',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          padding: 24, zIndex: 99999,
+        }}>
+          <div style={{ width: '100%', maxWidth: 360, display: 'flex', flexDirection: 'column', gap: 16 }}>
+            <div style={{ color: '#fff', fontSize: 20, fontWeight: 700 }}>Set new password</div>
+            <input
+              type="password"
+              placeholder="New password"
+              value={newPassword}
+              onChange={e => setNewPassword(e.target.value)}
+              style={{
+                background: '#1a1a2e', border: '1px solid rgba(255,255,255,0.15)',
+                borderRadius: 8, padding: '12px 14px', color: '#fff', fontSize: 14,
+                width: '100%', boxSizing: 'border-box', outline: 'none',
+              }}
+              onFocus={e => (e.target.style.borderColor = '#00c853')}
+              onBlur={e => (e.target.style.borderColor = 'rgba(255,255,255,0.15)')}
+            />
+            <input
+              type="password"
+              placeholder="Confirm new password"
+              value={confirmPassword}
+              onChange={e => setConfirmPassword(e.target.value)}
+              style={{
+                background: '#1a1a2e', border: '1px solid rgba(255,255,255,0.15)',
+                borderRadius: 8, padding: '12px 14px', color: '#fff', fontSize: 14,
+                width: '100%', boxSizing: 'border-box', outline: 'none',
+              }}
+              onFocus={e => (e.target.style.borderColor = '#00c853')}
+              onBlur={e => (e.target.style.borderColor = 'rgba(255,255,255,0.15)')}
+            />
+            {passwordError && (
+              <div style={{ color: '#f87171', fontSize: 12 }}>{passwordError}</div>
+            )}
+            <button
+              onClick={handleUpdatePassword}
+              style={{
+                background: '#00c853', color: '#fff', border: 'none',
+                borderRadius: 8, padding: '12px', fontSize: 14,
+                fontWeight: 600, cursor: 'pointer', width: '100%',
+              }}
+            >
+              Update password
+            </button>
+          </div>
+        </div>
+      )}
     </>
   )
 }
