@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { useAuth } from '../../contexts/AuthContext'
 import { supabase } from '../../lib/supabase'
+import PrivacyPolicy from '../Legal/PrivacyPolicy'
+import TermsOfService from '../Legal/TermsOfService'
 
 export default function AuthPage() {
   const { signIn, signUp } = useAuth()
@@ -15,6 +17,9 @@ export default function AuthPage() {
   const [resetEmail, setResetEmail] = useState('')
   const [resetSent, setResetSent] = useState(false)
   const [resetError, setResetError] = useState('')
+
+  const [showPrivacy, setShowPrivacy] = useState(false)
+  const [showTerms,   setShowTerms]   = useState(false)
 
   async function handleSubmit(e) {
     e.preventDefault()
@@ -212,9 +217,29 @@ export default function AuthPage() {
                 {mode === 'login' ? 'Sign up' : 'Sign in'}
               </button>
             </p>
+
+            <div style={{ textAlign: 'center', marginTop: 16, fontSize: 11, color: 'rgba(255,255,255,0.3)' }}>
+              By signing up you agree to our{' '}
+              <span
+                onClick={() => setShowTerms(true)}
+                style={{ color: 'rgba(255,255,255,0.5)', cursor: 'pointer', textDecoration: 'underline' }}
+              >
+                Terms of Service
+              </span>
+              {' '}and{' '}
+              <span
+                onClick={() => setShowPrivacy(true)}
+                style={{ color: 'rgba(255,255,255,0.5)', cursor: 'pointer', textDecoration: 'underline' }}
+              >
+                Privacy Policy
+              </span>
+            </div>
           </>
         )}
       </div>
+
+      {showPrivacy && <PrivacyPolicy onBack={() => setShowPrivacy(false)} />}
+      {showTerms   && <TermsOfService onBack={() => setShowTerms(false)} />}
     </div>
   )
 }

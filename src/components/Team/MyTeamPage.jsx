@@ -5,6 +5,8 @@ import theme from '../../theme'
 import PlayerCard from './PlayerCard'
 import AddPlayerModal from './AddPlayerModal'
 import BrandingFields from './BrandingFields'
+import PrivacyPolicy from '../Legal/PrivacyPolicy'
+import TermsOfService from '../Legal/TermsOfService'
 
 const DIVISIONS = ['8U', '10U', '12U', '14U', '16U', '19U']
 
@@ -76,6 +78,8 @@ export default function MyTeamPage({ onSignOut, onCreateTeam }) {
   const [editingPlayer, setEditingPlayer] = useState(null)
 
   const [error, setError] = useState('')
+  const [showPrivacy, setShowPrivacy] = useState(false)
+  const [showTerms,   setShowTerms]   = useState(false)
 
   // ── Derived values (before any early return) ──────────────────
   const teamColors = [team?.color_primary, team?.color_secondary, team?.color_accent].filter(Boolean)
@@ -467,7 +471,7 @@ export default function MyTeamPage({ onSignOut, onCreateTeam }) {
           </>
         )}
         {onSignOut && (
-          <div style={{ paddingTop: 8, paddingBottom: 8, textAlign: 'center' }}>
+          <div style={{ paddingTop: 8, paddingBottom: 4, textAlign: 'center' }}>
             <button
               onClick={onSignOut}
               style={{
@@ -482,6 +486,12 @@ export default function MyTeamPage({ onSignOut, onCreateTeam }) {
             </button>
           </div>
         )}
+
+        <div style={{ display: 'flex', gap: 16, justifyContent: 'center', marginTop: 4, marginBottom: 8, fontSize: 11, color: 'rgba(255,255,255,0.25)' }}>
+          <span onClick={() => setShowTerms(true)} style={{ cursor: 'pointer', textDecoration: 'underline' }}>Terms of Service</span>
+          <span>·</span>
+          <span onClick={() => setShowPrivacy(true)} style={{ cursor: 'pointer', textDecoration: 'underline' }}>Privacy Policy</span>
+        </div>
       </div>
 
       {/* ── Modals ── */}
@@ -507,6 +517,9 @@ export default function MyTeamPage({ onSignOut, onCreateTeam }) {
             style={{ borderColor: 'var(--team-primary, #1a5c2e)', borderTopColor: 'transparent' }} />
         </div>
       )}
+
+      {showPrivacy && <PrivacyPolicy onBack={() => setShowPrivacy(false)} />}
+      {showTerms   && <TermsOfService onBack={() => setShowTerms(false)} />}
     </div>
   )
 }
