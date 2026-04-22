@@ -56,9 +56,9 @@ const theme = {
   playerNameColor:     '#ffffff',
   quarterCircleEmpty:  'rgba(255,255,255,0.35)',
   quarterCircleFilled: '#00c853',
-  quarterCountText:    'rgba(255,255,255,0.45)',
+  quarterCountText:    'rgba(255,255,255,0.65)',
   panelHeaderBg:       'rgba(0,0,0,0.2)',
-  panelHeaderText:     'rgba(255,255,255,0.5)',
+  panelHeaderText:     'rgba(255,255,255,0.6)',
 
   // ─── Game Day — assigned player row ─────────────────────
   assignedRowGradient: 'linear-gradient(90deg, #0a5228 0%, #06a746 100%)',
@@ -72,27 +72,27 @@ const theme = {
 
   // ─── Game Day — absent row ───────────────────────────────
   absentRowBg:         'transparent',
-  absentRowText:       'rgba(255,255,255,0.3)',
+  absentRowText:       'rgba(255,255,255,0.5)',
 
   // ─── Practice screen ─────────────────────────────────────
   drillCardBg:         '#1a1a2e',
   drillCardBorder:     'rgba(255,255,255,0.08)',
   drillCardText:       '#ffffff',
-  drillCardSubtext:    'rgba(255,255,255,0.5)',
+  drillCardSubtext:    'rgba(255,255,255,0.7)',
 
   // ─── Category pill colors ────────────────────────────────
   catWarmup:           '#854F0B',
-  catDribbling:        '#185FA5',
-  catPassing:          '#0F6E56',
-  catShooting:         '#A32D2D',
-  catDefending:        '#534AB7',
-  catTeamwork:         '#3B6D11',
-  catCooldown:         '#444441',
+  catDribbling:        '#4A9FE0',
+  catPassing:          '#2DC49A',
+  catShooting:         '#E24B4A',
+  catDefending:        '#8B7FE8',
+  catTeamwork:         '#7BC142',
+  catCooldown:         '#A0A09A',
 
   // ─── Navigation ──────────────────────────────────────────
   navBg:               '#13131f',
   navActiveColor:      '#00c853',
-  navInactiveColor:    'rgba(255,255,255,0.4)',
+  navInactiveColor:    'rgba(255,255,255,0.55)',
   navBorderTop:        'rgba(255,255,255,0.08)',
   navColorMyTeam:      '#D4537E',
   navColorGameDay:     '#00c853',

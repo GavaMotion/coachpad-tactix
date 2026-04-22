@@ -1022,7 +1022,7 @@ export default function GameDayPage() {
                 <div style={{ color: '#fff', fontSize: 20, fontWeight: 700 }}>{team?.name}</div>
                 <div style={{ color: '#00c853', fontSize: 13 }}>{team?.division} Division — {activePlan?.name}</div>
               </div>
-              <div style={{ marginLeft: 'auto', color: 'rgba(255,255,255,0.4)', fontSize: 12 }}>{new Date().toLocaleDateString()}</div>
+              <div style={{ marginLeft: 'auto', color: 'rgba(255,255,255,0.6)', fontSize: 12 }}>{new Date().toLocaleDateString()}</div>
             </div>
             {/* 4 quarters */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16 }}>
@@ -1073,9 +1073,9 @@ export default function GameDayPage() {
                     {/* Bench */}
                     {benchPlayers.length > 0 && (
                       <div style={{ marginTop: 8, paddingTop: 8, borderTop: '1px solid rgba(255,255,255,0.08)' }}>
-                        <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 4 }}>Bench</div>
+                        <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.6)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 4 }}>Bench</div>
                         {benchPlayers.map(p => (
-                          <div key={p.id} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: 'rgba(255,255,255,0.45)', marginBottom: 3 }}>
+                          <div key={p.id} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: 'rgba(255,255,255,0.65)', marginBottom: 3 }}>
                             <span style={{ width: 18, height: 18, borderRadius: '50%', background: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 8, fontWeight: 700, flexShrink: 0, color: 'rgba(255,255,255,0.5)' }}>
                               {p.jersey_number}
                             </span>

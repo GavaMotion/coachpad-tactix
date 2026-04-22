@@ -202,7 +202,7 @@ export default function PlayerTagGrid({
             fontWeight:    700,
             textTransform: 'uppercase',
             letterSpacing: '0.08em',
-            color:         benchIsOver ? 'rgba(0,200,83,0.6)' : 'rgba(255,255,255,0.35)',
+            color:         benchIsOver ? 'rgba(0,200,83,0.6)' : 'rgba(255,255,255,0.55)',
             transition:    'color 0.15s',
           }}>
             BENCH Q{viewedQuarter} · {benchPlayers.length}
@@ -210,7 +210,7 @@ export default function PlayerTagGrid({
           {benchPlayers.length === 0 ? (
             <p style={{
               fontSize:  11,
-              color:     'rgba(255,255,255,0.18)',
+              color:     'rgba(255,255,255,0.5)',
               fontStyle: 'italic',
               padding:   '4px 10px 8px',
               margin:    0,

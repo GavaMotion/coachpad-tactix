@@ -230,7 +230,7 @@ function DrillTag({ drill, planDrillId, isPlan, isFavorite, onInfo, onFavorite, 
           role="button" aria-label={isFavorite ? 'Remove from favorites' : 'Add to favorites'} aria-pressed={isFavorite}
           onPointerDown={e => { e.stopPropagation(); e.preventDefault() }}
           onClick={e => { e.stopPropagation(); onFavorite?.() }}
-          style={{ fontSize: 28, color: isFavorite ? '#EF9F27' : 'rgba(255,255,255,0.3)', cursor: 'pointer', lineHeight: 1, padding: '2px 4px', flexShrink: 0, display: 'flex', alignItems: 'center' }}>
+          style={{ fontSize: 28, color: isFavorite ? '#EF9F27' : 'rgba(255,255,255,0.5)', cursor: 'pointer', lineHeight: 1, padding: '2px 4px', flexShrink: 0, display: 'flex', alignItems: 'center' }}>
           {isFavorite ? '★' : '☆'}
         </span>
         {isPlan && onRemove && (
@@ -238,7 +238,7 @@ function DrillTag({ drill, planDrillId, isPlan, isFavorite, onInfo, onFavorite, 
             role="button" aria-label="Remove drill from plan"
             onPointerDown={e => { e.stopPropagation(); e.preventDefault() }}
             onClick={e => { e.stopPropagation(); onRemove() }}
-            style={{ fontSize: 20, color: 'rgba(255,255,255,0.35)', cursor: 'pointer', lineHeight: 1, padding: '2px 4px', flexShrink: 0, display: 'flex', alignItems: 'center' }}>
+            style={{ fontSize: 20, color: 'rgba(255,255,255,0.55)', cursor: 'pointer', lineHeight: 1, padding: '2px 4px', flexShrink: 0, display: 'flex', alignItems: 'center' }}>
             ✕
           </span>
         )}
@@ -736,7 +736,7 @@ export default function PracticePage() {
 
             {/* Plan header */}
             <div style={{ height: 40, flexShrink: 0, display: 'flex', alignItems: 'center', padding: '0 12px', gap: 8, background: '#111827', borderBottom: '1px solid #1f2937' }}>
-              {isMobile && <span style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.3)', letterSpacing: '0.08em', textTransform: 'uppercase', flexShrink: 0 }}>MY PLAN</span>}
+              {isMobile && <span style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.55)', letterSpacing: '0.08em', textTransform: 'uppercase', flexShrink: 0 }}>MY PLAN</span>}
               <span style={{ color: '#fff', fontWeight: 700, fontSize: 13 }}>Total: {totalLabel}</span>
               {planNote && (
                 <span style={{ flex: 1, fontSize: 11, color: '#4ade80', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>
@@ -793,7 +793,7 @@ export default function PracticePage() {
               {planDrills.length === 0 ? (
                 <div data-drop="plan" style={{ height: '100%', minHeight: 180, display: 'flex', alignItems: 'center', justifyContent: 'center',
                   border: '2px dashed rgba(255,255,255,0.1)', borderRadius: 12 }}>
-                  <p style={{ color: 'rgba(255,255,255,0.22)', fontSize: 13, textAlign: 'center', padding: '0 16px' }}>
+                  <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: 13, textAlign: 'center', padding: '0 16px' }}>
                     Drag drills here to build your plan
                   </p>
                 </div>
@@ -832,7 +832,7 @@ export default function PracticePage() {
 
             {/* Library filters */}
             <div style={{ flexShrink: 0, padding: '8px 10px', background: '#111827', borderBottom: '1px solid #1f2937', display: 'flex', flexDirection: 'column', gap: 7 }}>
-              {isMobile && <span style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.3)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>DRILL LIBRARY</span>}
+              {isMobile && <span style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.55)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>DRILL LIBRARY</span>}
               {/* Row 1: search + age + favs + add drill */}
               <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                 <input type="search" placeholder="Search drills…" value={searchText}
@@ -905,7 +905,7 @@ export default function PracticePage() {
             <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', WebkitOverflowScrolling: 'touch', overscrollBehavior: 'contain', padding: '8px 10px', touchAction: dragState ? 'none' : 'pan-y' }}>
               {visibleDrills.length === 0 ? (
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 80 }}>
-                  <span style={{ color: 'rgba(255,255,255,0.2)', fontSize: 13 }}>No drills match filters</span>
+                  <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: 13 }}>No drills match filters</span>
                 </div>
               ) : (
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 6, alignContent: 'start' }}>
@@ -1006,7 +1006,7 @@ export default function PracticePage() {
                   <div style={{ color: '#00c853', fontSize: 12 }}>{activePlan?.name}</div>
                 </div>
                 <div style={{ marginLeft: 'auto', textAlign: 'right' }}>
-                  <div style={{ color: 'rgba(255,255,255,0.4)', fontSize: 11 }}>{new Date().toLocaleDateString()}</div>
+                  <div style={{ color: 'rgba(255,255,255,0.6)', fontSize: 11 }}>{new Date().toLocaleDateString()}</div>
                   <div style={{ color: '#00c853', fontSize: 13, fontWeight: 600 }}>Total: {totalMins} min</div>
                 </div>
               </div>
@@ -1030,7 +1030,7 @@ export default function PracticePage() {
                     <span style={{ fontSize: 10, color: categoryColor, fontWeight: 600, background: categoryColor + '20', padding: '2px 8px', borderRadius: 12 }}>
                       {drill.skill_category}
                     </span>
-                    <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: 12, marginLeft: 8 }}>{drill.duration_minutes} min</span>
+                    <span style={{ color: 'rgba(255,255,255,0.6)', fontSize: 12, marginLeft: 8 }}>{drill.duration_minutes} min</span>
                   </div>
                   {/* Description */}
                   {description && (
@@ -1048,16 +1048,16 @@ export default function PracticePage() {
                   {/* Variations */}
                   {variations.length > 0 && (
                     <div style={{ marginBottom: 10 }}>
-                      <div style={{ color: 'rgba(255,255,255,0.4)', fontSize: 11, fontWeight: 600, marginBottom: 5, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Variations</div>
+                      <div style={{ color: 'rgba(255,255,255,0.6)', fontSize: 11, fontWeight: 600, marginBottom: 5, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Variations</div>
                       {variations.map((v, i) => (
-                        <div key={i} style={{ color: 'rgba(255,255,255,0.4)', fontSize: 11, marginBottom: 4, paddingLeft: 12 }}>· {v}</div>
+                        <div key={i} style={{ color: 'rgba(255,255,255,0.6)', fontSize: 11, marginBottom: 4, paddingLeft: 12 }}>· {v}</div>
                       ))}
                     </div>
                   )}
                   {/* Video link */}
                   {videoUrl && (
                     <div style={{ marginTop: 8 }}>
-                      <span style={{ color: '#185FA5', fontSize: 11 }}>Watch drill video</span>
+                      <span style={{ color: '#4A9FE0', fontSize: 11 }}>Watch drill video</span>
                     </div>
                   )}
                 </div>

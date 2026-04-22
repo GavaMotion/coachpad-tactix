@@ -75,18 +75,18 @@ function PlayerRow({ player, quarterAssigned, totalPlanned, isAbsent, isOnField,
   const nameColor  = isGreenRow
     ? '#ffffff'
     : isAbsent
-      ? 'rgba(255,255,255,0.4)'
+      ? 'rgba(255,255,255,0.6)'
       : needsMore
         ? '#ffffff'
         : '#e5e7eb'
 
   const countColor = isAbsent
-    ? 'rgba(255,255,255,0.25)'
+    ? 'rgba(255,255,255,0.4)'
     : isGreenRow
       ? '#ffffff'
       : needsMore
         ? 'rgba(255,255,255,0.75)'
-        : 'rgba(255,255,255,0.45)'
+        : 'rgba(255,255,255,0.65)'
 
   const jerseyBg = isAbsent
     ? 'rgba(255,255,255,0.08)'
@@ -162,7 +162,7 @@ function PlayerRow({ player, quarterAssigned, totalPlanned, isAbsent, isOnField,
           </span>
         )}
         {isAbsent && (
-          <span style={{ flexShrink:0, fontSize:10, color:'rgba(255,255,255,0.35)' }}>absent</span>
+          <span style={{ flexShrink:0, fontSize:10, color:'rgba(255,255,255,0.55)' }}>absent</span>
         )}
         {needsMore && (
           <span style={{ flexShrink:0, fontWeight:600, fontSize:10, color:'#fbbf24' }}>⚠ &lt;3Q</span>
@@ -217,7 +217,7 @@ function PlayerRow({ player, quarterAssigned, totalPlanned, isAbsent, isOnField,
             ? theme.brandGreen
             : isGreenRow
               ? 'rgba(255,255,255,0.6)'
-              : 'rgba(255,255,255,0.3)',
+              : 'rgba(255,255,255,0.5)',
         }}
         title={isAbsent ? 'Mark present' : 'Mark absent'}
       >
@@ -336,7 +336,7 @@ export default function PlayerRosterList({
           <span style={{ display:'flex', alignItems:'center', gap:8 }}>
             {[1,2,3,4].map(q => (
               <span key={q} style={{
-                color:      q === viewedQuarter ? theme.brandGreen : 'rgba(255,255,255,0.25)',
+                color:      q === viewedQuarter ? theme.brandGreen : 'rgba(255,255,255,0.45)',
                 fontWeight: q === viewedQuarter ? 700 : 400,
               }}>
                 Q{q}
@@ -356,7 +356,7 @@ export default function PlayerRosterList({
         paddingBottom: isMobile ? 120 : 80,
       }}>
         {players.length === 0 ? (
-          <p style={{ color:'rgba(255,255,255,0.3)', fontSize:12, fontStyle:'italic', padding:'12px 10px' }}>
+          <p style={{ color:'rgba(255,255,255,0.55)', fontSize:12, fontStyle:'italic', padding:'12px 10px' }}>
             No players on roster yet.
           </p>
         ) : (
@@ -381,7 +381,7 @@ export default function PlayerRosterList({
                   style={{
                     padding:      '6px 16px',
                     fontSize:     11,
-                    color:        'rgba(255,255,255,0.3)',
+                    color:        'rgba(255,255,255,0.55)',
                     textTransform:'uppercase',
                     letterSpacing:'0.5px',
                     borderTop:    '1px solid rgba(255,255,255,0.08)',

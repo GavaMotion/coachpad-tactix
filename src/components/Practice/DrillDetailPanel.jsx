@@ -479,7 +479,7 @@ export default function DrillDetailPanel({ drill, source, teamId, onClose, onAdd
                 onClick={() => canPrev && onPrev?.()}
                 style={{ fontSize: 28, lineHeight: 1, padding: '0 4px', userSelect: 'none', color: canPrev ? 'rgba(255,255,255,0.5)' : 'transparent', cursor: canPrev ? 'pointer' : 'default' }}
               >‹</span>
-              <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)' }}>{navLabel}</span>
+              <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)' }}>{navLabel}</span>
               <span
                 onClick={() => canNext && onNext?.()}
                 style={{ fontSize: 28, lineHeight: 1, padding: '0 4px', userSelect: 'none', color: canNext ? 'rgba(255,255,255,0.5)' : 'transparent', cursor: canNext ? 'pointer' : 'default' }}

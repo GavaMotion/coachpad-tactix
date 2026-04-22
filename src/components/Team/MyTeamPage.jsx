@@ -531,7 +531,7 @@ export default function MyTeamPage({ onSignOut, onCreateTeam, onShowOnboarding }
           </button>
         </div>
 
-        <div style={{ display: 'flex', gap: 16, justifyContent: 'center', marginTop: 4, marginBottom: 4, fontSize: 11, color: 'rgba(255,255,255,0.25)' }}>
+        <div style={{ display: 'flex', gap: 16, justifyContent: 'center', marginTop: 4, marginBottom: 4, fontSize: 11, color: 'rgba(255,255,255,0.5)' }}>
           <span onClick={() => setShowTerms(true)} style={{ cursor: 'pointer', textDecoration: 'underline' }}>Terms of Service</span>
           <span>·</span>
           <span onClick={() => setShowPrivacy(true)} style={{ cursor: 'pointer', textDecoration: 'underline' }}>Privacy Policy</span>
@@ -540,7 +540,7 @@ export default function MyTeamPage({ onSignOut, onCreateTeam, onShowOnboarding }
         <span
           onClick={() => { localStorage.removeItem('onboardingComplete'); onShowOnboarding?.() }}
           style={{
-            color: 'rgba(255,255,255,0.2)', fontSize: 11, cursor: 'pointer',
+            color: 'rgba(255,255,255,0.5)', fontSize: 11, cursor: 'pointer',
             textDecoration: 'underline', display: 'block', textAlign: 'center',
             marginBottom: 8,
           }}
@@ -551,7 +551,7 @@ export default function MyTeamPage({ onSignOut, onCreateTeam, onShowOnboarding }
         <div style={{ textAlign: 'center', marginTop: 16, display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 8 }}>
           <a
             href={`mailto:${SUPPORT_EMAIL}`}
-            style={{ color: 'rgba(255,255,255,0.25)', fontSize: 11, textDecoration: 'none' }}
+            style={{ color: 'rgba(255,255,255,0.5)', fontSize: 11, textDecoration: 'none' }}
           >
             {SUPPORT_EMAIL}
           </a>
@@ -640,7 +640,7 @@ export default function MyTeamPage({ onSignOut, onCreateTeam, onShowOnboarding }
                   flex: 1,
                   background: deleteConfirmText === 'DELETE' ? '#A32D2D' : 'rgba(163,45,45,0.3)',
                   border: 'none', borderRadius: 8, padding: '12px',
-                  color: deleteConfirmText === 'DELETE' ? '#fff' : 'rgba(255,255,255,0.3)',
+                  color: deleteConfirmText === 'DELETE' ? '#fff' : 'rgba(255,255,255,0.5)',
                   fontSize: 14, fontWeight: 600,
                   cursor: deleteConfirmText === 'DELETE' ? 'pointer' : 'default',
                 }}

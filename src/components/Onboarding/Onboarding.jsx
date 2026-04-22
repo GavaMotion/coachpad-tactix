@@ -123,7 +123,7 @@ export default function Onboarding({ onComplete }) {
             onClick={handleSkip}
             style={{
               background: 'none', border: 'none',
-              color: 'rgba(255,255,255,0.3)', fontSize: 13,
+              color: 'rgba(255,255,255,0.6)', fontSize: 13,
               cursor: 'pointer', padding: '4px 0',
             }}
           >

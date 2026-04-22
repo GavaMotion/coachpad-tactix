@@ -18,7 +18,7 @@ export default function TermsOfService({ onBack }) {
           </button>
           <div>
             <div style={{ color: '#fff', fontSize: 20, fontWeight: 700 }}>Terms of Service</div>
-            <div style={{ color: 'rgba(255,255,255,0.4)', fontSize: 12 }}>Last updated: {new Date().toLocaleDateString()}</div>
+            <div style={{ color: 'rgba(255,255,255,0.6)', fontSize: 12 }}>Last updated: {new Date().toLocaleDateString()}</div>
           </div>
         </div>
 
@@ -81,7 +81,7 @@ export default function TermsOfService({ onBack }) {
         <div style={{
           marginTop: 40, paddingTop: 20,
           borderTop: '1px solid rgba(255,255,255,0.08)',
-          color: 'rgba(255,255,255,0.3)', fontSize: 11, textAlign: 'center',
+          color: 'rgba(255,255,255,0.55)', fontSize: 11, textAlign: 'center',
         }}>
           CoachPad Tactix — by Gava Motion
         </div>

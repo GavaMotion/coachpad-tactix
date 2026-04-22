@@ -13,7 +13,7 @@ class SketchErrorBoundary extends Component {
       return (
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 12, background: '#0a0f0c', padding: 24 }}>
           <p style={{ color: '#f87171', fontWeight: 700, fontSize: 14 }}>Sketch error — please reload</p>
-          <pre style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', maxWidth: 300, whiteSpace: 'pre-wrap' }}>{this.state.error?.message}</pre>
+          <pre style={{ fontSize: 10, color: 'rgba(255,255,255,0.6)', maxWidth: 300, whiteSpace: 'pre-wrap' }}>{this.state.error?.message}</pre>
           <button onClick={() => this.setState({ hasError: false, error: null })} style={{ padding: '6px 16px', borderRadius: 6, background: '#00c853', color: '#fff', fontSize: 13, cursor: 'pointer' }}>Try again</button>
         </div>
       )
@@ -745,7 +745,7 @@ export default function SketchPage() {
     return (
       <SketchErrorBoundary>
         <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0a0f0c' }}>
-          <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 14 }}>Set up your team first.</p>
+          <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: 14 }}>Set up your team first.</p>
         </div>
       </SketchErrorBoundary>
     )
@@ -909,7 +909,7 @@ export default function SketchPage() {
             height: 28, padding: '0 10px', borderRadius: 6, fontSize: 16,
             background: 'none',
             border: '1px solid rgba(255,255,255,0.15)',
-            color: history.length === 0 ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.7)',
+            color: history.length === 0 ? 'rgba(255,255,255,0.35)' : 'rgba(255,255,255,0.7)',
             cursor: history.length === 0 ? 'default' : 'pointer',
           }}
         >↩</button>
@@ -922,7 +922,7 @@ export default function SketchPage() {
             height: 28, padding: '0 10px', borderRadius: 6, fontSize: 16,
             background: 'none',
             border: '1px solid rgba(255,255,255,0.15)',
-            color: future.length === 0 ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.7)',
+            color: future.length === 0 ? 'rgba(255,255,255,0.35)' : 'rgba(255,255,255,0.7)',
             cursor: future.length === 0 ? 'default' : 'pointer',
           }}
         >↪</button>
@@ -953,7 +953,7 @@ export default function SketchPage() {
       }}>
         {/* Opp formation dropdown */}
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 2, flexShrink: 0 }}>
-          <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.35)', lineHeight: 1 }}>Formation</span>
+          <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.5)', lineHeight: 1 }}>Formation</span>
           <select
             value={oppFormationId || ''}
             onChange={e => handleOppFormationChange(e.target.value)}
@@ -971,7 +971,7 @@ export default function SketchPage() {
           </div>
         ))}
         {oppBenchPlayers.length === 0 && (
-          <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.2)', fontStyle: 'italic' }}>all on field</span>
+          <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', fontStyle: 'italic' }}>all on field</span>
         )}
       </div>
 
@@ -1088,7 +1088,7 @@ export default function SketchPage() {
       }}>
         {/* My formation dropdown */}
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 2, flexShrink: 0 }}>
-          <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.35)', lineHeight: 1 }}>Formation</span>
+          <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.5)', lineHeight: 1 }}>Formation</span>
           <select
             value={myFormationId || ''}
             onChange={e => handleMyFormationChange(e.target.value)}
@@ -1106,7 +1106,7 @@ export default function SketchPage() {
           </div>
         ))}
         {myBenchPlayers.length === 0 && (
-          <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.2)', fontStyle: 'italic' }}>all on field</span>
+          <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', fontStyle: 'italic' }}>all on field</span>
         )}
       </div>
     </div>

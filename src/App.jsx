@@ -531,7 +531,7 @@ function AppContent({ tab, setTab, onSignOut, onShowOnboarding }) {
             <button
               onClick={() => setShowInstallBanner(false)}
               aria-label="Dismiss install banner"
-              style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.4)', fontSize: 18, cursor: 'pointer', padding: '0 4px', lineHeight: 1 }}
+              style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.6)', fontSize: 18, cursor: 'pointer', padding: '0 4px', lineHeight: 1 }}
             >
               ✕
             </button>
@@ -553,7 +553,7 @@ function AppContent({ tab, setTab, onSignOut, onShowOnboarding }) {
           </div>
           <button
             onClick={() => { localStorage.setItem('iosInstallPromptSeen', 'true'); setShowIOSBanner(false) }}
-            style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.4)', fontSize: 12, cursor: 'pointer', width: '100%', textAlign: 'center', marginTop: 4 }}
+            style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.6)', fontSize: 12, cursor: 'pointer', width: '100%', textAlign: 'center', marginTop: 4 }}
           >
             Dismiss
           </button>

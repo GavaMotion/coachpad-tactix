@@ -152,7 +152,7 @@ export default function AuthPage() {
               style={{
                 background: 'none', border: '1px solid rgba(255,255,255,0.2)',
                 borderRadius: 8, padding: '10px 20px',
-                color: resendCooldown > 0 ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.7)',
+                color: resendCooldown > 0 ? 'rgba(255,255,255,0.5)' : 'rgba(255,255,255,0.7)',
                 fontSize: 13, cursor: resendCooldown > 0 ? 'default' : 'pointer',
               }}
             >
@@ -160,7 +160,7 @@ export default function AuthPage() {
             </button>
             <span
               onClick={() => { setShowVerificationMessage(false); setEmail(''); setPassword(''); setError('') }}
-              style={{ color: 'rgba(255,255,255,0.3)', fontSize: 12, cursor: 'pointer', textDecoration: 'underline' }}
+              style={{ color: 'rgba(255,255,255,0.6)', fontSize: 12, cursor: 'pointer', textDecoration: 'underline' }}
             >
               Back to login
             </span>
@@ -200,7 +200,7 @@ export default function AuthPage() {
             )}
             <span
               onClick={() => { setShowForgotPassword(false); setResetSent(false); setResetError('') }}
-              style={{ color: 'rgba(255,255,255,0.4)', fontSize: 12, cursor: 'pointer', textAlign: 'center', textDecoration: 'underline' }}
+              style={{ color: 'rgba(255,255,255,0.6)', fontSize: 12, cursor: 'pointer', textAlign: 'center', textDecoration: 'underline' }}
             >
               Back to login
             </span>
@@ -239,7 +239,7 @@ export default function AuthPage() {
                   <div style={{ textAlign: 'right', marginTop: 4 }}>
                     <span
                       onClick={() => { setShowForgotPassword(true); setResetEmail(email) }}
-                      style={{ color: 'rgba(255,255,255,0.4)', fontSize: 12, cursor: 'pointer', textDecoration: 'underline' }}
+                      style={{ color: 'rgba(255,255,255,0.6)', fontSize: 12, cursor: 'pointer', textDecoration: 'underline' }}
                     >
                       Forgot password?
                     </span>
@@ -324,7 +324,7 @@ export default function AuthPage() {
               </button>
             </p>
 
-            <div style={{ textAlign: 'center', marginTop: 16, fontSize: 11, color: 'rgba(255,255,255,0.3)' }}>
+            <div style={{ textAlign: 'center', marginTop: 16, fontSize: 11, color: 'rgba(255,255,255,0.55)' }}>
               By signing up you agree to our{' '}
               <span onClick={() => setShowTerms(true)} style={{ color: 'rgba(255,255,255,0.5)', cursor: 'pointer', textDecoration: 'underline' }}>
                 Terms of Service
