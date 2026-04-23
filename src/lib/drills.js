@@ -1058,27 +1058,6 @@ export const DRILLS = [
     ],
   },
   {
-    id: '4v4-mini-world-cup',
-    name: '4v4 Mini World Cup',
-    description:
-      'Teams of 4 pick a country name. Coach serves balls into the field and teams try to score in one goal with a keeper. Scoring team yells their country name. First team to score steps off; last team on the field loses that round. Play multiple rounds. High energy, lots of shooting, great for ending practice on a fun note.',
-    category: 'shooting',
-    minDivision: '8U',
-    phase: 'small-sided-game',
-    duration: 15,
-    players: '8–20',
-    equipment: ['balls', 'cones', 'goals'],
-    coachingPoints: [
-      'Shoot early — don\'t wait for the perfect chance',
-      'Be brave in front of goal',
-      'Celebrate as a team when you score',
-    ],
-    variations: [
-      'Play 3v3 for smaller groups',
-      'Add penalty kicks if tied after 2 minutes',
-    ],
-  },
-  {
     id: 'double-shadow-play',
     name: 'Double Shadow Play',
     description:
