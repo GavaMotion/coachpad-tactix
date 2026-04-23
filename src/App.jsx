@@ -482,11 +482,25 @@ function AppContent({ tab, setTab, onSignOut, onShowOnboarding }) {
         if (error) throw error
 
         if (data?.plan) {
-          setSubscription(prev => ({ ...prev, plan: data.plan }))
-          addToast(`Welcome to SquadIQ ${data.plan === 'premium' ? 'Premium' : 'Solo'}! 🎉`, 'success', 5000)
+          const { data: freshSub } = await supabase
+            .from('subscriptions')
+            .select('*')
+            .eq('user_id', user.id)
+            .single()
+
+          if (freshSub) setSubscription(freshSub)
+
+          addToast(
+            `Welcome to SquadIQ ${data.plan === 'premium' ? 'Premium Coach' : 'Solo Coach'}! 🎉`,
+            'success',
+            5000
+          )
+
+          setShowUpgradeModal(false)
         }
       } catch (err) {
         console.error('Payment confirmation error:', err)
+        addToast('Could not confirm subscription — please refresh the app', 'warning', 5000)
       }
     }
 

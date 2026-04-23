@@ -212,7 +212,11 @@ export function AppProvider({ userId, children }) {
     fetchSubscription()
   }, [userId])
 
-  const maxTeams       = PLANS[subscription?.plan]?.maxTeams ?? 1
+  const maxTeams = subscription?.plan_override === 'unlimited'
+    ? 999
+    : subscription?.plan === 'premium' ? 4
+    : subscription?.plan === 'solo'    ? 1
+    : 1
   const isTrialExpired = subscription?.plan === 'expired'
   const daysLeftInTrial = subscription?.plan === 'trial'
     ? Math.max(0, Math.ceil((new Date(subscription.trial_end) - new Date()) / (1000 * 60 * 60 * 24)))
