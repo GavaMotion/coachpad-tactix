@@ -103,27 +103,39 @@ export default function AuthPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-950 flex flex-col items-center justify-center px-4"
-      style={{ background: 'radial-gradient(ellipse at 50% 0%, rgba(0,200,83,0.08) 0%, var(--bg-primary) 60%)' }}>
+    <div style={{ position: 'relative', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', padding: '32px 24px' }}>
 
-      {/* Logo */}
-      <div className="mb-8 text-center">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full mb-4"
-          style={{ backgroundColor: 'var(--color-green-dark, #1a5c2e)', boxShadow: '0 0 24px rgba(0,200,83,0.3)' }}>
-          <svg className="w-9 h-9 text-white" fill="currentColor" viewBox="0 0 24 24">
-            <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" strokeWidth="1.5" />
-            <path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2zm0 1.5c1.16 0 2.27.22 3.29.61L12 7.36 8.71 4.11A8.47 8.47 0 0 1 12 3.5zm-4.5 1.27 3.5 3.5-1.5 4.5H6.08A8.51 8.51 0 0 1 4.5 8.5c0-1.4.34-2.73.95-3.9L7.5 4.77zm9 0 2.05.83c.61 1.17.95 2.5.95 3.9 0 1.22-.26 2.38-.72 3.42L17 12.77l-1.5-4.5 3.5-3.5zM6.08 14.5H9l2 3.46-1.27 3.5A8.52 8.52 0 0 1 3.5 12c0-.52.05-1.03.13-1.53L6.08 14.5zm7.92 0h2.92l2.45-4.03c.08.5.13 1.01.13 1.53a8.52 8.52 0 0 1-6.23 8.46L13 16l1-1.5zm-3 .77L9.73 18h4.54L13 15.27l-2 .77z" />
-          </svg>
+      {/* Blurred background image */}
+      <div style={{
+        position: 'absolute', inset: 0,
+        backgroundImage: 'url(/cover_V.png)',
+        backgroundSize: 'cover', backgroundPosition: 'center',
+        filter: 'blur(12px)', transform: 'scale(1.1)', opacity: 0.4,
+      }} />
+
+      {/* Dark overlay */}
+      <div style={{ position: 'absolute', inset: 0, background: 'rgba(13,13,26,0.75)' }} />
+
+      {/* Content */}
+      <div style={{ position: 'relative', zIndex: 1, width: '100%', maxWidth: 400, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 24 }}>
+
+        {/* Logo */}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+          <img src="/icons/icon-192.png" alt="SquadIQ" style={{ width: 90, height: 90, borderRadius: 20, boxShadow: '0 8px 32px rgba(0,0,0,0.4)' }} />
+          <div style={{ color: '#fff', fontSize: 28, fontWeight: 800, letterSpacing: '-0.5px' }}>
+            Squad<span style={{ color: '#00c853' }}>IQ</span>
+          </div>
+          <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: 13 }}>The smart coaching companion</div>
         </div>
-        <h1 className="text-3xl tracking-tight" style={{ color: '#fff', fontWeight: 400 }}>
-          Squad<span style={{ fontWeight: 800, color: 'var(--color-green, #00c853)' }}>IQ</span>
-        </h1>
-        <p className="text-gray-500 mt-1 text-sm">The smart coaching companion.</p>
-      </div>
 
-      {/* Card */}
-      <div className="w-full max-w-sm rounded-2xl shadow-xl p-8"
-        style={{ background: 'var(--bg-panel)', border: '1px solid var(--border-purple)' }}>
+        {/* Card */}
+        <div style={{
+          background: 'rgba(26,26,46,0.85)',
+          backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
+          border: '1px solid rgba(255,255,255,0.1)',
+          borderRadius: 20, padding: '32px 28px',
+          width: '100%', boxSizing: 'border-box',
+        }}>
 
         {/* ── Email verification screen ── */}
         {showVerificationMessage ? (
@@ -335,7 +347,8 @@ export default function AuthPage() {
             </div>
           </>
         )}
-      </div>
+        </div>{/* end card */}
+      </div>{/* end content */}
 
       {showPrivacy && <PrivacyPolicy onBack={() => setShowPrivacy(false)} />}
       {showTerms   && <TermsOfService onBack={() => setShowTerms(false)} />}
