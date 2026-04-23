@@ -123,7 +123,9 @@ export default function AddPlayerModal({ onSave, onClose, initial }) {
               <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                 Position Ratings
               </div>
-              {positions.map(pos => (
+              {positions
+              .filter(pos => !['DEF', 'MID', 'FWD'].includes(pos))
+              .map(pos => (
                 <div key={pos} style={{
                   display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                   background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)',
