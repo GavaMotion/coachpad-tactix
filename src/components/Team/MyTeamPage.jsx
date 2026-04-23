@@ -214,7 +214,6 @@ export default function MyTeamPage({ onSignOut, onCreateTeam, onShowOnboarding }
         if (err) throw err
         setPlayers(prev => [...prev, data].sort((a, b) => a.jersey_number - b.jersey_number))
         setPlayerCount(prev => prev + 1)
-        addToast('Player added', 'success')
       }
     } catch (err) {
       setError(err.message)
