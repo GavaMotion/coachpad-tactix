@@ -56,16 +56,11 @@ export function generateAILineup({
   formation,
   quarters        = [1, 2, 3, 4],
 }) {
-  console.log('AI DEBUG', {
-    totalPlayers: players.length,
-    absentAll: [...absentPlayerIds],
-    slots: (formation.slots || []).map(s => s.id + ':' + s.label),
-    quarters,
-    playerList: players.map(p => ({ name: p.name, id: p.id, positions: p.positions })),
-  })
-
   const slots        = formation.slots || []
   const allAvailable = players.filter(p => !absentPlayerIds.has(p.id))
+
+  // Safety check — log exact slot IDs to confirm they match formation
+  console.log('EXACT SLOT IDS:', slots.map(s => s.id))
 
   const sortedSlots = [...slots].sort((a, b) => {
     const ai = LABEL_ORDER.indexOf(a.label)
@@ -76,11 +71,15 @@ export function generateAILineup({
   const quarterCount = {}
   allAvailable.forEach(p => { quarterCount[p.id] = 0 })
 
-  console.log('PLAYERS IN:', allAvailable.map(p => ({
-    name: p.name, id: p.id, positions: p.positions, ratings: p.position_ratings,
-  })))
-  console.log('SLOTS:', slots.map(s => ({ id: s.id, label: s.label })))
-  console.log('QUARTERS:', quarters)
+  // GK rotation — distribute GK quarters evenly across GK-capable players
+  const gkPlayers = allAvailable.filter(p => (p.positions || []).includes('GK'))
+  const gkRotation = {}
+  if (gkPlayers.length > 1 && quarters.length === 4) {
+    quarters.forEach((q, i) => {
+      gkRotation[q] = gkPlayers[i % gkPlayers.length].id
+    })
+  }
+  console.log('GK players:', gkPlayers.map(p => p.name), 'rotation:', gkRotation)
 
   const lineup        = {}
   const outOfPosition = []
@@ -97,6 +96,16 @@ export function generateAILineup({
 
     // PASS 1 — assign players who match the slot label
     for (const slot of sortedSlots) {
+      // GK slot — use rotation if available
+      if (slot.label === 'GK' && gkRotation[q]) {
+        const rotatedGK = available.find(p => p.id === gkRotation[q] && !usedIds.has(p.id))
+        if (rotatedGK) {
+          assignment[slot.id] = rotatedGK.id
+          usedIds.add(rotatedGK.id)
+          continue
+        }
+      }
+
       let best      = null
       let bestScore = -Infinity
 
