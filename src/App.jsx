@@ -452,6 +452,8 @@ const isInStandalone = window.matchMedia('(display-mode: standalone)').matches
 // ── Inner content (rendered inside AppProvider) ──────────────────
 function AppContent({ tab, setTab, onSignOut, onShowOnboarding }) {
   const { createTeam, syncPendingChanges, activeTeamId, teams, maxTeams, isTrialExpired, daysLeftInTrial, subscription } = useApp()
+  const { session } = useAuth()
+  const user = session?.user
   const { addToast } = useToast()
   const isOnline = useOnlineStatus()
   const wasOfflineRef = useRef(false)
@@ -462,20 +464,52 @@ function AppContent({ tab, setTab, onSignOut, onShowOnboarding }) {
   const [checkoutLoading, setCheckoutLoading] = useState(null)
 
   async function handleUpgrade(plan) {
-    const priceId = PRICE_IDS[plan === 'multi' ? 'premium' : 'solo'][billingPeriod]
-    setCheckoutLoading(plan)
     try {
+      const priceKey = plan === 'multi' ? 'premium' : 'solo'
+      const priceId = PRICE_IDS[priceKey]?.[billingPeriod]
+
+      console.log('=== UPGRADE CLICKED ===')
+      console.log('plan:', plan)
+      console.log('billingPeriod:', billingPeriod)
+      console.log('priceId:', priceId)
+      console.log('user.id:', user?.id)
+      console.log('user.email:', user?.email)
+
+      if (!priceId) {
+        addToast(`No price ID found for ${plan} ${billingPeriod}`, 'error')
+        return
+      }
+      if (!user?.id) {
+        addToast('Not logged in', 'error')
+        return
+      }
+
+      addToast('Redirecting to checkout...', 'info', 3000)
+
+      const payload = {
+        priceId,
+        userId: user.id,
+        userEmail: user.email,
+        successUrl: 'https://squadiq-coach.vercel.app',
+        cancelUrl: 'https://squadiq-coach.vercel.app',
+      }
+
+      console.log('Sending payload:', JSON.stringify(payload))
+
       const { data, error } = await supabase.functions.invoke('create-checkout', {
-        body: { priceId, billingPeriod },
+        body: payload,
       })
-      if (error || !data?.url) throw new Error(error?.message || 'No checkout URL returned')
-      const stripe = await getStripe()
+
+      console.log('Response data:', data)
+      console.log('Response error:', error)
+
+      if (error) throw error
+      if (!data?.url) throw new Error('No checkout URL returned')
+
       window.location.href = data.url
     } catch (err) {
-      addToast('Could not start checkout — please try again', 'error')
       console.error('Checkout error:', err)
-    } finally {
-      setCheckoutLoading(null)
+      addToast('Could not start checkout — please try again', 'error')
     }
   }
 
