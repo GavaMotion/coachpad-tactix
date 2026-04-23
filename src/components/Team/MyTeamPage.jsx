@@ -109,41 +109,6 @@ export default function MyTeamPage({ onSignOut, onCreateTeam, onShowOnboarding }
 
   if (!dataLoaded) return <MyTeamSkeleton />
 
-  if (dataLoaded && !team) {
-    return (
-      <div style={{
-        display: 'flex', flexDirection: 'column', alignItems: 'center',
-        justifyContent: 'center', height: '100%', padding: 32,
-        textAlign: 'center', gap: 20,
-      }}>
-        <div style={{
-          width: 80, height: 80, borderRadius: '50%',
-          background: 'rgba(0,200,83,0.15)', border: '2px solid rgba(0,200,83,0.3)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 36,
-        }}>
-          ⚽
-        </div>
-        <div>
-          <div style={{ color: '#fff', fontSize: 20, fontWeight: 700, marginBottom: 8 }}>
-            No teams yet
-          </div>
-          <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: 14, lineHeight: 1.6, maxWidth: 280 }}>
-            Create a team to get started. Add your players, set your formation and start planning.
-          </div>
-        </div>
-        <button
-          onClick={onCreateTeam}
-          style={{
-            background: '#00c853', color: '#fff', border: 'none', borderRadius: 12,
-            padding: '14px 32px', fontSize: 16, fontWeight: 700, cursor: 'pointer',
-            width: '100%', maxWidth: 280,
-          }}
-        >
-          + Create my first team
-        </button>
-      </div>
-    )
-  }
 
   // ── Handlers ─────────────────────────────────────────────────
 
