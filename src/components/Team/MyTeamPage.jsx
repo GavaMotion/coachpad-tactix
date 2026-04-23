@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { supabase } from '../../lib/supabase'
 import { useApp, applyTeamCSSVars } from '../../contexts/AppContext'
+import { useAuth } from '../../contexts/AuthContext'
 import { useToast } from '../UI/Toast'
 import theme from '../../theme'
 import PlayerCard from './PlayerCard'
@@ -66,6 +67,8 @@ export default function MyTeamPage({ onSignOut, onCreateTeam, onShowOnboarding }
     subscription,
   } = useApp()
   const { addToast } = useToast()
+  const { session } = useAuth()
+  const userEmail = session?.user?.email
 
   // Team edit state
   const [teamName,    setTeamName]    = useState('')
@@ -631,14 +634,35 @@ export default function MyTeamPage({ onSignOut, onCreateTeam, onShowOnboarding }
           View intro again
         </span>
 
-        <div style={{ textAlign: 'center', marginTop: 16, display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 8 }}>
-          <a
-            href={`mailto:${SUPPORT_EMAIL}`}
-            style={{ color: 'rgba(255,255,255,0.5)', fontSize: 11, textDecoration: 'none' }}
+        <div style={{ textAlign: 'center', marginTop: 16, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+          <button
+            onClick={() => {
+              const subject = encodeURIComponent('SquadIQ Support Request')
+              const body = encodeURIComponent(
+                `Hi SquadIQ Support,\n\n` +
+                `I need help with:\n\n` +
+                `[Describe your issue here]\n\n` +
+                `---\n` +
+                `App version: ${APP_VERSION}\n` +
+                `Account: ${userEmail}\n`
+              )
+              window.open(`mailto:${SUPPORT_EMAIL}?subject=${subject}&body=${body}`)
+            }}
+            style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+              background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.12)',
+              borderRadius: 10, padding: '10px 20px', color: 'rgba(255,255,255,0.6)',
+              fontSize: 13, cursor: 'pointer', width: '100%', maxWidth: 280, marginTop: 8,
+            }}
+            aria-label="Contact support"
           >
-            {SUPPORT_EMAIL}
-          </a>
-          <div style={{ color: 'rgba(255,255,255,0.15)', fontSize: 10 }}>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+              <polyline points="22,6 12,12 2,6"/>
+            </svg>
+            Contact Support
+          </button>
+          <div style={{ color: 'rgba(255,255,255,0.15)', fontSize: 10, marginTop: 6, textAlign: 'center' }}>
             SquadIQ v{APP_VERSION}
           </div>
         </div>
