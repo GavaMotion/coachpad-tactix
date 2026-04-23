@@ -6,7 +6,7 @@ function MiniTag({ player, badge, isMobile, onDragStart, fromSource, isDragging 
     <div
       onPointerDown={e => onDragStart(e, player.id, fromSource, null)}
       style={{
-        width:          isMobile ? 54 : 62,
+        width:          isMobile ? 59 : 68,
         display:        'flex',
         flexDirection:  'column',
         alignItems:     'center',
@@ -15,7 +15,7 @@ function MiniTag({ player, badge, isMobile, onDragStart, fromSource, isDragging 
         padding:        '5px 3px',
         background:     'rgba(220,50,50,0.1)',
         border:         '1.5px solid rgba(220,50,50,0.3)',
-        borderRadius:   6,
+        borderRadius:   7,
         opacity:        isDragging ? 0.3 : 1,
         cursor:         'grab',
         touchAction:    'none',
@@ -25,11 +25,11 @@ function MiniTag({ player, badge, isMobile, onDragStart, fromSource, isDragging 
         transition:     'opacity 0.1s',
       }}
     >
-      <span style={{ fontWeight: 700, fontSize: 12, color: '#fff', lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
+      <span style={{ fontWeight: 700, fontSize: 14, color: '#fff', lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
         {player.jersey_number}
       </span>
       <span style={{
-        fontSize:     9,
+        fontSize:     10,
         color:        '#d1d5db',
         maxWidth:     '100%',
         overflow:     'hidden',
@@ -133,7 +133,7 @@ export default function OutPanel({
     p => !outAllIds.has(p.id) && (outQIds[viewedQuarter] || new Set()).has(p.id)
   )
 
-  const w = 72
+  const w = 80
 
   return (
     <div style={{

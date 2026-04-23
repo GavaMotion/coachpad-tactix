@@ -25,8 +25,8 @@ function PlayerTag({ player, quarterStates, isOnFieldNow, totalPlanned, isMobile
   else if (totalPlanned > 0)  borderColor = '#EF9F27'
   else                         borderColor = 'rgba(255,255,255,0.18)'
 
-  const w = isMobile ? 68 : 76
-  const h = isMobile ? 56 : 64
+  const w = isMobile ? 75 : 84
+  const h = isMobile ? 62 : 70
 
   return (
     <div
@@ -53,11 +53,11 @@ function PlayerTag({ player, quarterStates, isOnFieldNow, totalPlanned, isMobile
         transition:     'border-color 0.15s, background 0.15s, box-shadow 0.15s, opacity 0.1s',
       }}
     >
-      <span style={{ fontWeight: 700, fontSize: isMobile ? 14 : 15, color: '#fff', lineHeight: 1 }}>
+      <span style={{ fontWeight: 700, fontSize: isMobile ? 16 : 17, color: '#fff', lineHeight: 1 }}>
         {player.jersey_number}
       </span>
       <span style={{
-        fontSize:     10,
+        fontSize:     12,
         color:        '#d1d5db',
         lineHeight:   1.2,
         maxWidth:     '90%',

@@ -25,8 +25,8 @@ const slotColors = {
 
 // ── Draggable player chip (field variant) ────────────────────────
 function PlayerChip({ player, fromSlot, sizePct, chipColor, onDragStart, isDragging }) {
-  const fs  = `clamp(7px, ${sizePct * 0.26}vw, 12px)`
-  const fs2 = `clamp(5px, ${sizePct * 0.20}vw, 9px)`
+  const fs  = `clamp(8px, ${sizePct * 0.29}vw, 13px)`
+  const fs2 = `clamp(6px, ${sizePct * 0.22}vw, 10px)`
 
   return (
     <div
@@ -67,7 +67,7 @@ function Slot({ slot, slotSizePct, player, zone, onDragStart, draggingPlayerId, 
   const isDragging = !!player && player.id === draggingPlayerId
   const isMobile   = window.innerWidth < 768
   const hitArea    = isMobile ? 90 : 80
-  const visualSize = player ? 52 : 48
+  const visualSize = player ? 57 : 53
 
   return (
     <div
@@ -123,7 +123,7 @@ function Slot({ slot, slotSizePct, player, zone, onDragStart, draggingPlayerId, 
           <span style={{
             color:      isOver ? '#fff' : theme.slotText,
             fontWeight: 700,
-            fontSize:   `clamp(6px,${slotSizePct * 0.26}vw,11px)`,
+            fontSize:   `clamp(7px,${slotSizePct * 0.29}vw,12px)`,
             userSelect: 'none',
           }}>
             {slot.label}
