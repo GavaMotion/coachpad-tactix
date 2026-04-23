@@ -55,7 +55,10 @@ function DeleteTeamDialog({ teamName, onConfirm, onCancel }) {
 }
 
 // ── Main page ─────────────────────────────────────────────────────
-export default function MyTeamPage({ onSignOut, onCreateTeam, onShowOnboarding }) {
+const isRunningInBrowser = !window.matchMedia('(display-mode: standalone)').matches
+const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
+
+export default function MyTeamPage({ onSignOut, onCreateTeam, onShowOnboarding, installPrompt, onInstallApp }) {
   const {
     teams,     setTeams,
     team,      setTeam,
@@ -93,7 +96,8 @@ export default function MyTeamPage({ onSignOut, onCreateTeam, onShowOnboarding }
   const [deleteConfirmText, setDeleteConfirmText] = useState('')
   const [deleteError,       setDeleteError]       = useState('')
   const [isDeleting,        setIsDeleting]        = useState(false)
-  const [billingLoading,    setBillingLoading]    = useState(false)
+  const [billingLoading,       setBillingLoading]       = useState(false)
+  const [showIOSInstallModal,  setShowIOSInstallModal]  = useState(false)
 
   async function handleManageBilling() {
     setBillingLoading(true)
@@ -588,6 +592,35 @@ export default function MyTeamPage({ onSignOut, onCreateTeam, onShowOnboarding }
           </div>
         )}
 
+        {/* Install App button — browser only */}
+        {isRunningInBrowser && (installPrompt || isIOS) && (
+          <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 4 }}>
+            <button
+              onClick={() => {
+                if (installPrompt) {
+                  onInstallApp?.()
+                } else if (isIOS) {
+                  setShowIOSInstallModal(true)
+                }
+              }}
+              style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                background: 'rgba(0,200,83,0.1)', border: '1px solid rgba(0,200,83,0.3)',
+                borderRadius: 10, padding: '10px 20px', color: '#00c853',
+                fontSize: 13, fontWeight: 600, cursor: 'pointer', width: '100%', maxWidth: 280,
+              }}
+              aria-label="Install app"
+            >
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="7 10 12 15 17 10"/>
+                <line x1="12" y1="15" x2="12" y2="3"/>
+              </svg>
+              Install App
+            </button>
+          </div>
+        )}
+
         {onSignOut && (
           <div style={{ paddingTop: 8, paddingBottom: 4, textAlign: 'center' }}>
             <button
@@ -715,6 +748,51 @@ export default function MyTeamPage({ onSignOut, onCreateTeam, onShowOnboarding }
 
       {showPrivacy && <PrivacyPolicy onBack={() => setShowPrivacy(false)} />}
       {showTerms   && <TermsOfService onBack={() => setShowTerms(false)} />}
+
+      {showIOSInstallModal && (
+        <div style={{
+          position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)',
+          display: 'flex', alignItems: 'flex-end', justifyContent: 'center',
+          zIndex: 9999, padding: 16,
+        }}>
+          <div style={{
+            background: '#1a1a2e', border: '1px solid rgba(0,200,83,0.2)',
+            borderRadius: 20, padding: 28, width: '100%', maxWidth: 400,
+            display: 'flex', flexDirection: 'column', gap: 16, marginBottom: 8,
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ color: '#fff', fontSize: 16, fontWeight: 700 }}>Install SquadIQ</div>
+              <button onClick={() => setShowIOSInstallModal(false)}
+                style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.4)', fontSize: 20, cursor: 'pointer' }}>
+                ✕
+              </button>
+            </div>
+            {[
+              { icon: '⬆️', text: 'Tap the Share button at the bottom of your browser' },
+              { icon: '➕', text: 'Scroll down and tap "Add to Home Screen"' },
+              { icon: '✅', text: 'Tap "Add" in the top right corner' },
+            ].map(({ icon, text }, i) => (
+              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                <div style={{
+                  width: 32, height: 32, borderRadius: '50%',
+                  background: 'rgba(0,200,83,0.15)', border: '1px solid rgba(0,200,83,0.3)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: 16, flexShrink: 0,
+                }}>
+                  {icon}
+                </div>
+                <div style={{ color: 'rgba(255,255,255,0.7)', fontSize: 13, lineHeight: 1.5 }}>{text}</div>
+              </div>
+            ))}
+            <button onClick={() => setShowIOSInstallModal(false)} style={{
+              background: '#00c853', color: '#fff', border: 'none', borderRadius: 10,
+              padding: '12px', fontSize: 14, fontWeight: 600, cursor: 'pointer', marginTop: 4,
+            }}>
+              Got it!
+            </button>
+          </div>
+        </div>
+      )}
 
       {showDeleteAccount && (
         <div style={{

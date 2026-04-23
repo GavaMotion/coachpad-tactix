@@ -557,12 +557,8 @@ function AppContent({ tab, setTab, onSignOut, onShowOnboarding }) {
     await createTeam(name, division, branding)
   }
 
-  // Android install prompt
   const [installPrompt,     setInstallPrompt]     = useState(null)
   const [showInstallBanner, setShowInstallBanner] = useState(false)
-
-  // iOS install hint
-  const [showIOSBanner, setShowIOSBanner] = useState(false)
 
   useEffect(() => {
     function onResize() { setIsWide(window.innerWidth >= 768) }
@@ -595,36 +591,38 @@ function AppContent({ tab, setTab, onSignOut, onShowOnboarding }) {
   }, [addToast])
 
   useEffect(() => {
-    function onBeforeInstall(e) {
+    const isInstalled = window.matchMedia('(display-mode: standalone)').matches
+    const alreadyDismissed = localStorage.getItem('installBannerDismissed')
+    if (isInstalled || alreadyDismissed) return
+
+    function handleBeforeInstall(e) {
       e.preventDefault()
       setInstallPrompt(e)
       setShowInstallBanner(true)
+      setTimeout(() => {
+        setShowInstallBanner(false)
+        localStorage.setItem('installBannerDismissed', 'true')
+      }, 6000)
     }
-    window.addEventListener('beforeinstallprompt', onBeforeInstall)
-    return () => window.removeEventListener('beforeinstallprompt', onBeforeInstall)
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstall)
+    return () => window.removeEventListener('beforeinstallprompt', handleBeforeInstall)
   }, [])
 
-  useEffect(() => {
-    if (isIOS && !isInStandalone) {
-      const seen = localStorage.getItem('iosInstallPromptSeen')
-      if (!seen) {
-        const t = setTimeout(() => setShowIOSBanner(true), 3000)
-        return () => clearTimeout(t)
-      }
-    }
-  }, [])
+  function dismissInstallBanner() {
+    setShowInstallBanner(false)
+    localStorage.setItem('installBannerDismissed', 'true')
+  }
 
-  async function handleInstall() {
+  async function handleInstallApp() {
     if (!installPrompt) return
     installPrompt.prompt()
     const result = await installPrompt.userChoice
-    if (result.outcome === 'accepted') setShowInstallBanner(false)
-  }
-
-  const bannerStyle = {
-    position: 'fixed', bottom: 70, left: 16, right: 16,
-    background: '#1a1a2e', border: '1px solid rgba(0,200,83,0.3)',
-    borderRadius: 12, padding: '12px 16px', zIndex: 9999,
+    if (result.outcome === 'accepted') {
+      localStorage.setItem('installBannerDismissed', 'true')
+    }
+    setShowInstallBanner(false)
+    setInstallPrompt(null)
   }
 
   const cacheAge = activeTeamId ? getCachedAge(`cache_players_${activeTeamId}`) : null
@@ -646,56 +644,33 @@ function AppContent({ tab, setTab, onSignOut, onShowOnboarding }) {
       )}
       {isWide && <AppHeader onSignOut={onSignOut} />}
       <div style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-        {tab === 'team'     && <MyTeamPage onSignOut={isWide ? undefined : onSignOut} onCreateTeam={() => setShowNewTeam(true)} onShowOnboarding={onShowOnboarding} />}
+        {tab === 'team'     && <MyTeamPage onSignOut={isWide ? undefined : onSignOut} onCreateTeam={() => setShowNewTeam(true)} onShowOnboarding={onShowOnboarding} installPrompt={installPrompt} onInstallApp={handleInstallApp} />}
         {tab === 'lineup'   && <GameDayPage />}
         {tab === 'sketch'   && <SketchPage />}
         {tab === 'practice' && <PracticePage />}
       </div>
       <TabBar active={tab} onChange={setTab} />
 
-      {/* Android install banner */}
+      {/* Install banner — shows once for 6s */}
       {showInstallBanner && (
-        <div style={bannerStyle}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <img src="/icons/icon-72.png" style={{ width: 40, height: 40, borderRadius: 8, flexShrink: 0 }} alt="" />
-            <div style={{ flex: 1 }}>
-              <div style={{ color: '#fff', fontSize: 13, fontWeight: 600 }}>Install SquadIQ</div>
-              <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: 11 }}>Add to your home screen</div>
-            </div>
-            <button
-              onClick={handleInstall}
-              style={{ background: '#00c853', color: '#fff', border: 'none', borderRadius: 8, padding: '6px 14px', fontSize: 12, fontWeight: 600, cursor: 'pointer', flexShrink: 0 }}
-            >
-              Install
-            </button>
-            <button
-              onClick={() => setShowInstallBanner(false)}
-              aria-label="Dismiss install banner"
-              style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.6)', fontSize: 18, cursor: 'pointer', padding: '0 4px', lineHeight: 1 }}
-            >
-              ✕
-            </button>
+        <div style={{
+          position: 'fixed', bottom: 70, left: 16, right: 16,
+          background: '#1a1a2e', border: '1px solid rgba(0,200,83,0.3)',
+          borderRadius: 12, padding: '12px 14px',
+          display: 'flex', alignItems: 'center', gap: 10,
+          zIndex: 9990, boxShadow: '0 4px 20px rgba(0,0,0,0.4)',
+          animation: 'slideUp 0.3s ease',
+        }}>
+          <img src="/icons/icon-192.png" style={{ width: 36, height: 36, borderRadius: 8, flexShrink: 0 }} alt="SquadIQ" />
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ color: '#fff', fontSize: 13, fontWeight: 600 }}>Install SquadIQ</div>
+            <div style={{ color: 'rgba(255,255,255,0.4)', fontSize: 11 }}>Add to your home screen</div>
           </div>
-        </div>
-      )}
-
-      {/* iOS install hint */}
-      {showIOSBanner && (
-        <div style={bannerStyle}>
-          <div style={{ color: '#fff', fontSize: 13, fontWeight: 600, marginBottom: 6 }}>
-            Install SquadIQ
-          </div>
-          <div style={{ color: 'rgba(255,255,255,0.6)', fontSize: 12, lineHeight: 1.5 }}>
-            Tap the <strong style={{ color: '#fff' }}>Share</strong> button below, then tap <strong style={{ color: '#fff' }}>"Add to Home Screen"</strong>
-          </div>
-          <div style={{ fontSize: 22, textAlign: 'center', margin: '8px 0', color: '#00c853' }}>
-            ↑ Share → Add to Home Screen
-          </div>
-          <button
-            onClick={() => { localStorage.setItem('iosInstallPromptSeen', 'true'); setShowIOSBanner(false) }}
-            style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.6)', fontSize: 12, cursor: 'pointer', width: '100%', textAlign: 'center', marginTop: 4 }}
-          >
-            Dismiss
+          <button onClick={handleInstallApp} style={{ background: '#00c853', color: '#fff', border: 'none', borderRadius: 8, padding: '6px 14px', fontSize: 12, fontWeight: 700, cursor: 'pointer', flexShrink: 0 }}>
+            Install
+          </button>
+          <button onClick={dismissInstallBanner} aria-label="Dismiss" style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.3)', fontSize: 18, cursor: 'pointer', padding: '0 2px', flexShrink: 0 }}>
+            ✕
           </button>
         </div>
       )}
