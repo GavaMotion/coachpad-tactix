@@ -61,7 +61,7 @@ function PlayerChip({ player, fromSlot, sizePct, chipColor, onDragStart, isDragg
 }
 
 // ── Droppable slot ───────────────────────────────────────────────
-function Slot({ slot, slotSizePct, player, zone, onDragStart, draggingPlayerId, hoverSlotId, isAnyDragging }) {
+function Slot({ slot, slotSizePct, player, zone, onDragStart, draggingPlayerId, hoverSlotId, isAnyDragging, isOutOfPosition }) {
   const colors = slotColors[zone] || slotColors.FWD
   const isOver     = hoverSlotId === slot.id
   const isDragging = !!player && player.id === draggingPlayerId
@@ -92,19 +92,31 @@ function Slot({ slot, slotSizePct, player, zone, onDragStart, draggingPlayerId, 
           width:       visualSize,
           height:      visualSize,
           borderRadius:'50%',
-          border:      `2px solid ${isOver ? '#fff' : theme.slotFilledBorder}`,
+          border:      `2px solid ${isOver ? '#fff' : isOutOfPosition ? '#EF9F27' : theme.slotFilledBorder}`,
           boxShadow:   theme.slotFilledShadow,
-          overflow:    'hidden',
+          overflow:    'visible',
           flexShrink:  0,
         }}>
-          <PlayerChip
-            player={player}
-            fromSlot={slot.id}
-            sizePct={slotSizePct}
-            chipColor={colors.filledBg}
-            onDragStart={onDragStart}
-            isDragging={isDragging}
-          />
+          <div style={{ position: 'absolute', inset: 0, borderRadius: '50%', overflow: 'hidden' }}>
+            <PlayerChip
+              player={player}
+              fromSlot={slot.id}
+              sizePct={slotSizePct}
+              chipColor={colors.filledBg}
+              onDragStart={onDragStart}
+              isDragging={isDragging}
+            />
+          </div>
+          {isOutOfPosition && (
+            <div style={{
+              position: 'absolute', top: -3, right: -3,
+              width: 14, height: 14, borderRadius: '50%',
+              background: '#EF9F27',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: 8, fontWeight: 700, color: '#000', zIndex: 2,
+              pointerEvents: 'none',
+            }}>!</div>
+          )}
         </div>
       ) : (
         /* Empty slot — visual only, centered inside hit area */
@@ -211,28 +223,34 @@ function FieldZones() {
 export default function GameField({
   formation, slotAssignments, players,
   onDragStart, draggingPlayerId, hoverSlotId, isDragging,
+  outOfPositionPlayerIds,
 }) {
   if (!formation) return null
 
   const playerMap = Object.fromEntries(players.map(p => [p.id, p]))
+  const oop = outOfPositionPlayerIds || new Set()
 
   return (
     <div style={{ position:'relative', width:'100%', height:'100%', overflow:'hidden' }}>
       <FieldSVG />
       <FieldZones />
-      {formation.slots.map(slot => (
-        <Slot
-          key={slot.id}
-          slot={slot}
-          slotSizePct={formation.slotSizePct}
-          player={slotAssignments[slot.id] ? playerMap[slotAssignments[slot.id]] : null}
-          zone={getZone(slot.label)}
-          onDragStart={onDragStart}
-          draggingPlayerId={draggingPlayerId}
-          hoverSlotId={hoverSlotId}
-          isAnyDragging={isDragging}
-        />
-      ))}
+      {formation.slots.map(slot => {
+        const playerId = slotAssignments[slot.id]
+        return (
+          <Slot
+            key={slot.id}
+            slot={slot}
+            slotSizePct={formation.slotSizePct}
+            player={playerId ? playerMap[playerId] : null}
+            zone={getZone(slot.label)}
+            onDragStart={onDragStart}
+            draggingPlayerId={draggingPlayerId}
+            hoverSlotId={hoverSlotId}
+            isAnyDragging={isDragging}
+            isOutOfPosition={!!playerId && oop.has(playerId)}
+          />
+        )
+      })}
     </div>
   )
 }

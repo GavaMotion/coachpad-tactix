@@ -168,8 +168,9 @@ export default function GameDayPage() {
   const formation       = activeQState?.formation    || null
   const formationId     = activeQState?.formationId  || null
   const slots           = activeQState?.slots         || {}
-  const outAllIds       = activePlanState?.outAllIds || new Set()
-  const outQIds         = activePlanState?.outQIds   || { 1: new Set(), 2: new Set(), 3: new Set(), 4: new Set() }
+  const outAllIds              = activePlanState?.outAllIds              || new Set()
+  const outQIds                = activePlanState?.outQIds                || { 1: new Set(), 2: new Set(), 3: new Set(), 4: new Set() }
+  const outOfPositionByQuarter = activePlanState?.outOfPositionByQuarter || {}
 
   const playerMap     = useMemo(() => Object.fromEntries((players || []).map(p => [p.id, p])), [players])
   const formationList = team ? (FORMATIONS_BY_DIVISION[team.division] || []) : []
@@ -714,7 +715,7 @@ export default function GameDayPage() {
       ? [1, 2, 3, 4]
       : [parseInt(aiQuarterMode.replace('Q', '').replace(' only', ''))]
 
-    const { lineup, warnings } = generateAILineup({
+    const { lineup, warnings, outOfPosition } = generateAILineup({
       players,
       absentPlayerIds: allAbsentIds,
       absentQuarters:  aiAbsentQuarters,
@@ -728,6 +729,14 @@ export default function GameDayPage() {
       for (const q of quartersToGenerate) {
         updatedQuarters[q] = { ...updatedQuarters[q], slots: lineup[q] || {} }
       }
+
+      const outOfPositionByQuarter = quartersToGenerate.reduce((acc, q) => {
+        acc[q] = new Set(
+          outOfPosition.filter(o => o.quarter === q).map(o => o.playerId).filter(Boolean)
+        )
+        return acc
+      }, {})
+
       return {
         ...prev,
         [activePlanId]: {
@@ -740,13 +749,20 @@ export default function GameDayPage() {
             3: new Set(Object.entries(aiAbsentQuarters).filter(([, qs]) => qs.includes(3)).map(([id]) => id)),
             4: new Set(Object.entries(aiAbsentQuarters).filter(([, qs]) => qs.includes(4)).map(([id]) => id)),
           },
+          outOfPositionByQuarter,
         },
       }
     })
 
     setShowAILineup(false)
 
-    if (warnings.length > 0) {
+    if (outOfPosition.length > 0) {
+      const uniqueNames = [...new Set(outOfPosition.map(o => `#${o.jerseyNumber} ${o.playerName.split(' ')[0]}`))]
+      const msg = uniqueNames.length === 1
+        ? `⚠ ${uniqueNames[0]} placed out of position`
+        : `⚠ ${uniqueNames.length} players placed out of position`
+      addToast(msg, 'warning', 5000)
+    } else if (warnings.length > 0) {
       addToast(`⚠ ${warnings[0]}`, 'warning', 4000)
     } else {
       addToast(
@@ -1004,6 +1020,7 @@ export default function GameDayPage() {
                 draggingPlayerId={draggingPlayerId}
                 hoverSlotId={hoverSlotId}
                 isDragging={draggingPlayerId !== null}
+                outOfPositionPlayerIds={outOfPositionByQuarter[viewedQuarter] || new Set()}
               />
             )}
           </div>
