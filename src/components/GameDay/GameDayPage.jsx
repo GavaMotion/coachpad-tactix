@@ -701,6 +701,7 @@ export default function GameDayPage() {
 
   // ─── AI Lineup ───────────────────────────────────────────────
   function handleGenerateAILineup() {
+    console.log('HANDLE GENERATE CALLED', { players: players?.length, formation })
     const currentFormation = formation || getFormationById(
       planStates[activePlanId]?.quarters?.[viewedQuarter]?.formationId
     )
@@ -1275,7 +1276,7 @@ export default function GameDayPage() {
             )}
 
             {/* Generate button */}
-            <button onClick={handleGenerateAILineup} style={{
+            <button onClick={() => { console.log('GENERATE BUTTON CLICKED'); handleGenerateAILineup() }} style={{
               background: 'linear-gradient(135deg, #7b3fa8, #00c853)', border: 'none',
               borderRadius: 12, padding: 14, color: '#fff', fontSize: 15, fontWeight: 700,
               cursor: 'pointer', width: '100%', flexShrink: 0,

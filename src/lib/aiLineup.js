@@ -56,6 +56,14 @@ export function generateAILineup({
   formation,
   quarters        = [1, 2, 3, 4],
 }) {
+  console.log('AI DEBUG', {
+    totalPlayers: players.length,
+    absentAll: [...absentPlayerIds],
+    slots: (formation.slots || []).map(s => s.id + ':' + s.label),
+    quarters,
+    playerList: players.map(p => ({ name: p.name, id: p.id, positions: p.positions })),
+  })
+
   const slots        = formation.slots || []
   const allAvailable = players.filter(p => !absentPlayerIds.has(p.id))
 
@@ -67,6 +75,12 @@ export function generateAILineup({
 
   const quarterCount = {}
   allAvailable.forEach(p => { quarterCount[p.id] = 0 })
+
+  console.log('PLAYERS IN:', allAvailable.map(p => ({
+    name: p.name, id: p.id, positions: p.positions, ratings: p.position_ratings,
+  })))
+  console.log('SLOTS:', slots.map(s => ({ id: s.id, label: s.label })))
+  console.log('QUARTERS:', quarters)
 
   const lineup        = {}
   const outOfPosition = []
@@ -126,6 +140,14 @@ export function generateAILineup({
         quarter:      q,
       })
     }
+
+    console.log(`Q${q} final assignment:`, Object.entries(assignment).map(([slotId, playerId]) => {
+      const player = allAvailable.find(p => p.id === playerId)
+      const slot   = slots.find(s => s.id === slotId)
+      return `${slot?.label}(${slotId}) → ${player?.name}`
+    }))
+    console.log(`Q${q} empty slots:`, slots.filter(s => !assignment[s.id]).map(s => s.label + '(' + s.id + ')'))
+    console.log(`Q${q} unused players:`, allAvailable.filter(p => !Object.values(assignment).includes(p.id)).map(p => p.name))
 
     // Update quarter counts after filling this quarter
     Object.values(assignment).forEach(pid => {
