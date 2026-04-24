@@ -743,51 +743,60 @@ export default function GameDayPage() {
 
   // ─── AI Lineup ───────────────────────────────────────────────
   function handleGenerateAILineup() {
-    console.log('HANDLE GENERATE CALLED', { players: players?.length, formation })
-    const currentFormation = formation || getFormationById(
-      planStates[activePlanId]?.quarters?.[viewedQuarter]?.formationId
-    )
-    if (!currentFormation) {
-      addToast('Please select a formation first', 'warning')
-      return
-    }
-
-    const existingAbsent = new Set(planStates[activePlanId]?.outAllIds || [])
-    const allAbsentIds   = new Set([...existingAbsent, ...aiAbsentAll])
     const quartersToGenerate = aiQuarterMode === 'All 4'
       ? [1, 2, 3, 4]
       : [parseInt(aiQuarterMode.replace('Q', '').replace(' only', ''))]
 
-    const { lineup, warnings, outOfPosition } = generateAILineup({
-      players,
-      absentPlayerIds: allAbsentIds,
-      absentQuarters:  aiAbsentQuarters,
-      formation: currentFormation,
-      quarters: quartersToGenerate,
-    })
+    const allAbsentIds = new Set([
+      ...(planStates[activePlanId]?.outAllIds || []),
+      ...aiAbsentAll,
+    ])
 
-    console.log('LINEUP TO APPLY:', JSON.stringify(lineup))
+    const combinedLineup        = {}
+    const combinedOutOfPosition = []
+    const combinedWarnings      = []
+
+    for (const q of quartersToGenerate) {
+      const qFormationId = planStates[activePlanId]?.quarters?.[q]?.formationId
+      const qFormation   = getFormationById(qFormationId) || formation
+      if (!qFormation) {
+        combinedWarnings.push(`Q${q}: no formation set`)
+        continue
+      }
+
+      const { lineup: qLineup, outOfPosition: qOOP, warnings: qWarnings } = generateAILineup({
+        players,
+        absentPlayerIds: allAbsentIds,
+        absentQuarters:  aiAbsentQuarters,
+        formation:       qFormation,
+        quarters:        [q],
+      })
+
+      combinedLineup[q] = qLineup[q] || {}
+      combinedOutOfPosition.push(...qOOP)
+      combinedWarnings.push(...qWarnings)
+    }
 
     setPlanStates(prev => {
-      const current = prev[activePlanId] || {}
+      const current        = prev[activePlanId] || {}
       const updatedQuarters = { ...(current.quarters || {}) }
       for (const q of quartersToGenerate) {
-        updatedQuarters[q] = { ...updatedQuarters[q], slots: lineup[q] || {} }
+        updatedQuarters[q] = { ...updatedQuarters[q], slots: combinedLineup[q] || {} }
       }
 
       const outOfPositionByQuarter = quartersToGenerate.reduce((acc, q) => {
         acc[q] = new Set(
-          outOfPosition.filter(o => o.quarter === q).map(o => o.playerId).filter(Boolean)
+          combinedOutOfPosition.filter(o => o.quarter === q).map(o => o.playerId).filter(Boolean)
         )
         return acc
       }, {})
 
-      const newState = {
+      return {
         ...prev,
         [activePlanId]: {
           ...current,
           quarters: updatedQuarters,
-          outAllIds: new Set([...existingAbsent, ...aiAbsentAll]),
+          outAllIds: new Set([...(current.outAllIds || []), ...aiAbsentAll]),
           outQIds: {
             1: new Set(Object.entries(aiAbsentQuarters).filter(([, qs]) => qs.includes(1)).map(([id]) => id)),
             2: new Set(Object.entries(aiAbsentQuarters).filter(([, qs]) => qs.includes(2)).map(([id]) => id)),
@@ -797,22 +806,15 @@ export default function GameDayPage() {
           outOfPositionByQuarter,
         },
       }
-      console.log('NEW PLAN STATE Q slots:', JSON.stringify(
-        Object.fromEntries(quartersToGenerate.map(q => [q, newState[activePlanId].quarters[q]?.slots]))
-      ))
-      return newState
     })
 
     setShowAILineup(false)
 
-    if (outOfPosition.length > 0) {
-      const uniqueNames = [...new Set(outOfPosition.map(o => `#${o.jerseyNumber} ${o.playerName.split(' ')[0]}`))]
-      const msg = uniqueNames.length === 1
-        ? `⚠ ${uniqueNames[0]} placed out of position`
-        : `⚠ ${uniqueNames.length} players placed out of position`
-      addToast(msg, 'warning', 5000)
-    } else if (warnings.length > 0) {
-      addToast(`⚠ ${warnings[0]}`, 'warning', 4000)
+    if (combinedOutOfPosition.length > 0) {
+      const names = [...new Set(combinedOutOfPosition.map(o => `#${o.jerseyNumber} ${o.playerName}`))]
+      addToast(`⚠ ${names.length === 1 ? names[0] : names.length + ' players'} placed out of position`, 'warning', 5000)
+    } else if (combinedWarnings.length > 0) {
+      addToast(`⚠ ${combinedWarnings[0]}`, 'warning', 4000)
     } else {
       addToast(
         `✨ Lineup generated for ${quartersToGenerate.length === 4 ? 'all 4 quarters' : `Q${quartersToGenerate[0]}`}`,
