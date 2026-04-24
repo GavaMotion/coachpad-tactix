@@ -175,13 +175,6 @@ export default function GameDayPage() {
   const playerMap     = useMemo(() => Object.fromEntries((players || []).map(p => [p.id, p])), [players])
   const formationList = team ? (FORMATIONS_BY_DIVISION[team.division] || []) : []
 
-  useEffect(() => {
-    console.log(`FIELD SLOTS Q${viewedQuarter}:`, JSON.stringify(slots), '| formation slots:', formation?.slots?.map(s => s.id))
-  }, [slots, viewedQuarter]) // eslint-disable-line react-hooks/exhaustive-deps
-
-  console.log('ACTIVE Q STATE SLOTS:', activeQState?.slots)
-  console.log('ACTIVE Q FORMATION:', activeQState?.formationId)
-
   const quarterPlansForList = useMemo(() => ({
     1: quarters?.[1]?.slots || {},
     2: quarters?.[2]?.slots || {},
@@ -1347,7 +1340,7 @@ export default function GameDayPage() {
             )}
 
             {/* Generate button */}
-            <button onClick={() => { console.log('GENERATE BUTTON CLICKED'); handleGenerateAILineup() }} style={{
+            <button onClick={handleGenerateAILineup} style={{
               background: 'linear-gradient(135deg, #7b3fa8, #00c853)', border: 'none',
               borderRadius: 12, padding: 14, color: '#fff', fontSize: 15, fontWeight: 700,
               cursor: 'pointer', width: '100%', flexShrink: 0,

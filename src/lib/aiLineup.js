@@ -59,9 +59,6 @@ export function generateAILineup({
   const slots        = formation.slots || []
   const allAvailable = players.filter(p => !absentPlayerIds.has(p.id))
 
-  // Safety check — log exact slot IDs to confirm they match formation
-  console.log('EXACT SLOT IDS:', slots.map(s => s.id))
-
   const sortedSlots = [...slots].sort((a, b) => {
     const ai = LABEL_ORDER.indexOf(a.label)
     const bi = LABEL_ORDER.indexOf(b.label)
@@ -82,8 +79,6 @@ export function generateAILineup({
       gkPerQuarter[q] = gkCapable[i % gkCapable.length].id
     })
   }
-  console.log('GK players:', gkCapable.map(p => p.name), 'gkPerQuarter:', gkPerQuarter)
-
   const lineup        = {}
   const outOfPosition = []
   const warnings      = []
@@ -154,14 +149,6 @@ export function generateAILineup({
         quarter:      q,
       })
     }
-
-    console.log(`Q${q} final assignment:`, Object.entries(assignment).map(([slotId, playerId]) => {
-      const player = allAvailable.find(p => p.id === playerId)
-      const slot   = slots.find(s => s.id === slotId)
-      return `${slot?.label}(${slotId}) → ${player?.name}`
-    }))
-    console.log(`Q${q} empty slots:`, slots.filter(s => !assignment[s.id]).map(s => s.label + '(' + s.id + ')'))
-    console.log(`Q${q} unused players:`, allAvailable.filter(p => !Object.values(assignment).includes(p.id)).map(p => p.name))
 
     // Update quarter counts after filling this quarter
     Object.values(assignment).forEach(pid => {
