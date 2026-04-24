@@ -227,6 +227,9 @@ export default function GameField({
 }) {
   if (!formation) return null
 
+  console.log('GAMEFIELD slotAssignments:', slotAssignments)
+  console.log('GAMEFIELD formation slots:', formation?.slots?.map(s => s.id))
+
   const playerMap = Object.fromEntries(players.map(p => [p.id, p]))
   const oop = outOfPositionPlayerIds || new Set()
 

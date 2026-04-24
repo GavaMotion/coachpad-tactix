@@ -179,6 +179,9 @@ export default function GameDayPage() {
     console.log(`FIELD SLOTS Q${viewedQuarter}:`, JSON.stringify(slots), '| formation slots:', formation?.slots?.map(s => s.id))
   }, [slots, viewedQuarter]) // eslint-disable-line react-hooks/exhaustive-deps
 
+  console.log('ACTIVE Q STATE SLOTS:', activeQState?.slots)
+  console.log('ACTIVE Q FORMATION:', activeQState?.formationId)
+
   const quarterPlansForList = useMemo(() => ({
     1: quarters?.[1]?.slots || {},
     2: quarters?.[2]?.slots || {},
@@ -485,18 +488,53 @@ export default function GameDayPage() {
 
   // ─── Field clear ─────────────────────────────────────────────
   function handleClearQuarter() {
-    updateActivePlanState(state => {
-      const qState = state.quarters[viewedQuarter]
-      if (!qState) return state
+    const q = viewedQuarter
+    setPlanStates(prev => {
+      const current = prev[activePlanId] || {}
       return {
-        ...state,
-        quarters: {
-          ...state.quarters,
-          [viewedQuarter]: { ...qState, slots: emptyPlan(qState.formation) },
+        ...prev,
+        [activePlanId]: {
+          ...current,
+          quarters: {
+            ...current.quarters,
+            [q]: { ...current.quarters?.[q], slots: {} },
+          },
+          outQIds: {
+            ...(current.outQIds || {}),
+            [q]: new Set(),
+          },
+          outOfPositionByQuarter: {
+            ...(current.outOfPositionByQuarter || {}),
+            [q]: new Set(),
+          },
         },
       }
     })
-    scheduleSave()
+    scheduleSave(activePlanId)
+    addToast(`Q${q} cleared`, 'info', 2000)
+  }
+
+  function handleClearAll() {
+    if (!window.confirm('Clear all 4 quarters and reset OUT buckets?')) return
+    setPlanStates(prev => {
+      const current = prev[activePlanId] || {}
+      const clearedQuarters = {}
+      for (const q of [1, 2, 3, 4]) {
+        clearedQuarters[q] = { ...current.quarters?.[q], slots: {} }
+      }
+      return {
+        ...prev,
+        [activePlanId]: {
+          ...current,
+          quarters: clearedQuarters,
+          outAllIds: new Set(),
+          outQIds: { 1: new Set(), 2: new Set(), 3: new Set(), 4: new Set() },
+          outOfPositionByQuarter: {},
+        },
+      }
+    })
+    scheduleSave(activePlanId)
+    addToast('All quarters cleared', 'info', 2000)
   }
 
   // ─── OUT handlers ─────────────────────────────────────────────
@@ -936,10 +974,31 @@ export default function GameDayPage() {
           <div className="flex items-center gap-1 px-2 flex-shrink-0">
             <button
               onClick={handleClearQuarter}
-              className="text-xs text-gray-500 hover:text-red-400 transition px-1.5 py-1 rounded hover:bg-red-900/20"
-              title={`Clear Q${viewedQuarter}`}
+              style={{
+                background: 'rgba(255,255,255,0.06)',
+                border: '1px solid rgba(255,255,255,0.1)',
+                borderRadius: 8,
+                padding: '7px 12px',
+                color: 'rgba(255,255,255,0.5)',
+                fontSize: 12,
+                cursor: 'pointer',
+              }}
             >
-              Clear
+              Clear Q{viewedQuarter}
+            </button>
+            <button
+              onClick={handleClearAll}
+              style={{
+                background: 'rgba(220,50,50,0.08)',
+                border: '1px solid rgba(220,50,50,0.2)',
+                borderRadius: 8,
+                padding: '7px 12px',
+                color: 'rgba(220,80,80,0.8)',
+                fontSize: 12,
+                cursor: 'pointer',
+              }}
+            >
+              Clear All
             </button>
           </div>
         </div>
