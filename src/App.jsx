@@ -8,6 +8,8 @@ import { supabase } from './lib/supabase'
 import { getStripe, PRICE_IDS } from './lib/stripe'
 import AuthPage from './components/Auth/AuthPage'
 import Onboarding from './components/Onboarding/Onboarding'
+import PrivacyPolicy from './components/Legal/PrivacyPolicy'
+import TermsOfService from './components/Legal/TermsOfService'
 import MyTeamPage from './components/Team/MyTeamPage'
 import GameDayPage from './components/GameDay/GameDayPage'
 import SketchPage from './components/Sketch/SketchPage'
@@ -835,6 +837,11 @@ function AppContent({ tab, setTab, onSignOut, onShowOnboarding }) {
 
 // ── Root ─────────────────────────────────────────────────────────
 export default function App() {
+  // Serve legal pages at /privacy and /terms without requiring auth
+  const pathname = window.location.pathname
+  if (pathname === '/privacy') return <PrivacyPolicy onBack={() => window.history.back()} />
+  if (pathname === '/terms')   return <TermsOfService onBack={() => window.history.back()} />
+
   const { session, signOut } = useAuth()
   const { addToast } = useToast()
   const [tab, setTab] = useState('team')
