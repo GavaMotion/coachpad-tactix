@@ -138,7 +138,7 @@ export default function StandingsPage({ team }) {
               placeholder="https://s11e-26-spring.matchtrak.com/..."
               style={{ flex: 1, background: '#0d0d1a', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 8, padding: '10px 12px', color: '#fff', fontSize: 12 }}
             />
-            <button onClick={fetchStandings} disabled={loading || !url.trim()} style={{
+            <button onClick={() => fetchStandings()} disabled={loading || !url.trim()} style={{
               background: loading ? 'rgba(0,200,83,0.4)' : '#00c853',
               border: 'none', borderRadius: 8, padding: '10px 16px',
               color: '#fff', fontSize: 13, fontWeight: 600, cursor: 'pointer', flexShrink: 0,
