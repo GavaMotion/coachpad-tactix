@@ -10,12 +10,20 @@ const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/
 
 // ─── MatchTrak ───────────────────────────────────────────────
 function parseMatchTrakHTML(html: string) {
-  const cleaned = html
+  let cleaned = html;
+
+  // Single pass: strip innermost tables (decorative colored-bar logos with no nested tables)
+  cleaned = cleaned.replace(/<table\b[^>]*>(?:[^<]|<(?!\/table>|table\b))*<\/table>/gi, ' ');
+
+  cleaned = cleaned
     .replace(/<\/table>\s*<table[^>]*>/gi, ' ')
     .replace(/<font[^>]*>/gi, '')
     .replace(/<\/font>/gi, '')
     .replace(/<i>/gi, '')
-    .replace(/<\/i>/gi, '');
+    .replace(/<\/i>/gi, '')
+    .replace(/<b>/gi, '')
+    .replace(/<\/b>/gi, '')
+    .replace(/<img[^>]*>/gi, '');
 
   const rowRegex = /<tr[^>]*>([\s\S]*?)<\/tr>/gi;
   const anchorRegex = /<a[^>]*>([\s\S]*?)<\/a>/i;
@@ -24,19 +32,18 @@ function parseMatchTrakHTML(html: string) {
   let rowMatch;
 
   while ((rowMatch = rowRegex.exec(cleaned)) !== null) {
+    const rowHTML = rowMatch[0];
+    if (rowHTML.includes('class="header"') || rowHTML.includes('nav')) continue;
+
     const cells: string[] = [];
-    let cellMatch;
     const localCellRegex = /<t[dh][^>]*>([\s\S]*?)<\/t[dh]>/gi;
+    let cellMatch;
     while ((cellMatch = localCellRegex.exec(rowMatch[1])) !== null) {
       let text = cellMatch[1];
       const anchorMatch = anchorRegex.exec(text);
-      if (anchorMatch) {
-        text = anchorMatch[1];
-      }
+      if (anchorMatch) text = anchorMatch[1];
       text = text.replace(/<[^>]+>/g, '').trim();
-      if (text.includes('~')) {
-        text = text.split('~')[0].trim();
-      }
+      if (text.includes('~')) text = text.split('~')[0].trim();
       cells.push(text);
     }
     if (cells.some(c => c.length > 0)) allRows.push(cells);
@@ -47,11 +54,11 @@ function parseMatchTrakHTML(html: string) {
   let headerIdx = -1;
   const colMap: Record<string, number> = {};
 
-  for (let i = 0; i < Math.min(10, allRows.length); i++) {
+  for (let i = 0; i < Math.min(15, allRows.length); i++) {
     const row = allRows[i].map(c => c.toLowerCase().trim());
     const hasPoints = row.some(c => c === 'points' || c === 'pts');
-    const hasTeam = row.some(c => c === 'team' || c === 'club');
-    if (hasPoints || hasTeam) {
+    const hasMP = row.some(c => c === 'mp' || c === 'gp');
+    if (hasPoints || hasMP) {
       headerIdx = i;
       let pointsFound = false;
       row.forEach((cell, idx) => {
@@ -77,16 +84,26 @@ function parseMatchTrakHTML(html: string) {
   if (headerIdx === -1) return null;
 
   const rows: any[] = [];
+  const seen = new Set<string>();
+
   for (let i = headerIdx + 1; i < allRows.length; i++) {
     const row = allRows[i];
     if (row.length < 3) continue;
 
     const teamName = row[colMap.team ?? 0]?.trim();
-    if (!teamName || teamName.length < 2 || /^[\d\s\-]+$/.test(teamName)) continue;
+    if (!teamName || teamName.length < 2) continue;
+    if (/^[\d\s\-]+$/.test(teamName)) continue;
+    const lowerName = teamName.toLowerCase();
+    if (lowerName.includes('flight') ||
+        lowerName.includes('group') ||
+        lowerName.includes('division') ||
+        lowerName === 'team') continue;
+    if (seen.has(teamName)) continue;
+    seen.add(teamName);
 
     let w = 0, l = 0, t = 0;
     if (colMap.wld !== undefined && row[colMap.wld]) {
-      const parts = row[colMap.wld].split('-').map(p => parseInt(p) || 0);
+      const parts = row[colMap.wld].split('-').map((p: string) => parseInt(p) || 0);
       w = parts[0] || 0;
       l = parts[1] || 0;
       t = parts[2] || 0;
@@ -101,15 +118,9 @@ function parseMatchTrakHTML(html: string) {
     const pts = colMap.pts !== undefined ? parseInt(row[colMap.pts]) || (w * 3 + t) : (w * 3 + t);
     const gp = colMap.gp !== undefined ? parseInt(row[colMap.gp]) || (w + l + t) : (w + l + t);
 
-    rows.push({
-      team: teamName,
-      gp,
-      w, l, t,
-      gf,
-      ga,
-      gd: gf !== null && ga !== null ? gf - ga : null,
-      pts,
-    });
+    if (w === 0 && l === 0 && t === 0 && pts === 0 && gp === 0) continue;
+
+    rows.push({ team: teamName, gp, w, l, t, gf, ga, gd: gf !== null && ga !== null ? gf - ga : null, pts });
   }
 
   return rows.length > 0 ? rows : null;
