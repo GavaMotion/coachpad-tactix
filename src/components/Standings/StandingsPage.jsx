@@ -24,7 +24,7 @@ export default function StandingsPage({ team }) {
       .from('standings')
       .select('*')
       .eq('team_id', team.id)
-      .single()
+      .maybeSingle()
     if (data) {
       setMode(data.mode === 'manual' ? 'manual' : 'url')
       setStandings(data.table_data || null)
@@ -36,7 +36,7 @@ export default function StandingsPage({ team }) {
   async function fetchStandings(overrideUrl = null) {
     const fetchUrl = overrideUrl || url
     console.log('fetchStandings called with:', fetchUrl)
-    if (!fetchUrl.trim()) {
+    if (!fetchUrl || typeof fetchUrl !== 'string' || !fetchUrl.trim()) {
       console.log('URL is empty, returning')
       return
     }
