@@ -11,6 +11,8 @@ export default function StandingsPage({ team }) {
   const [showAddGame, setShowAddGame] = useState(false)
   const [newGame, setNewGame] = useState({ opponent: '', goalsFor: '', goalsAgainst: '', date: new Date().toISOString().split('T')[0] })
   const [platform, setPlatform] = useState(null)
+  const [divisions, setDivisions] = useState(null)
+  const [selectedDivision, setSelectedDivision] = useState(null)
 
   useEffect(() => {
     if (!team?.id) return
@@ -31,17 +33,26 @@ export default function StandingsPage({ team }) {
     }
   }
 
-  async function fetchStandings() {
-    if (!url.trim()) return
+  async function fetchStandings(overrideUrl = null) {
+    const fetchUrl = overrideUrl || url
+    if (!fetchUrl.trim()) return
     setLoading(true)
     setError(null)
+    setDivisions(null)
     try {
       const { data, error: fnError } = await supabase.functions.invoke('scrape-standings', {
-        body: { url: url.trim(), teamId: team.id, save: true },
+        body: { url: fetchUrl.trim(), teamId: team.id, save: !!overrideUrl || !overrideUrl },
       })
       if (fnError || data?.error) throw new Error(data?.error || fnError?.message || 'Failed to fetch standings')
+
+      if (data?.needsDivisionPick) {
+        setDivisions(data.divisions)
+        return
+      }
+
       setStandings(data.standings)
       setPlatform(data.platform)
+      setDivisions(null)
     } catch (err) {
       setError(err.message)
     } finally {
@@ -141,6 +152,40 @@ export default function StandingsPage({ team }) {
                   Switch to manual entry →
                 </button>
               </div>
+            </div>
+          )}
+
+          {divisions && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <div style={{ color: 'rgba(255,255,255,0.6)', fontSize: 12, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                Select your division:
+              </div>
+              {divisions.map(div => (
+                <button
+                  key={div.id}
+                  onClick={() => {
+                    setSelectedDivision(div)
+                    fetchStandings(div.url)
+                  }}
+                  style={{
+                    background: 'rgba(255,255,255,0.04)',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    borderRadius: 10,
+                    padding: '12px 14px',
+                    color: '#fff',
+                    fontSize: 14,
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    textAlign: 'left',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                  }}
+                >
+                  <span>{div.label}</span>
+                  <span style={{ color: 'rgba(255,255,255,0.3)', fontSize: 12 }}>→</span>
+                </button>
+              ))}
             </div>
           )}
 

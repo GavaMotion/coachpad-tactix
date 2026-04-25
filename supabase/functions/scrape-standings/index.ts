@@ -10,25 +10,55 @@ const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/
 
 // ─── MatchTrak ───────────────────────────────────────────────
 async function fetchMatchTrak(url: string) {
-  const subdomain = new URL(url).hostname.split('.')[0];
+  const parsedUrl = new URL(url);
+  const subdomain = parsedUrl.hostname.split('.')[0];
   const base = `https://${subdomain}.matchtrak.com`;
 
-  // Try CSV export first (easiest)
-  const csvUrl = `${base}/11/main.nsf/standings-csv-open?openform`;
-  try {
-    const res = await fetch(csvUrl, { headers: { 'User-Agent': UA } });
-    if (res.ok) {
-      const csv = await res.text();
-      return parseMatchTrakCSV(csv);
-    }
-  } catch (_) {}
+  const csvEndpoints = [
+    `${base}/11/main.nsf/standings-csv-open?openform`,
+    `${base}/main.nsf/standings-csv-open?openform`,
+    `${base}/standings-csv-open?openform`,
+  ];
 
-  // Fallback: scrape the standings HTML page
-  const htmlUrl = `${base}/11/main.nsf/standings-circuit?openview&count=1000&ExpandView`;
-  const res = await fetch(htmlUrl, { headers: { 'User-Agent': UA } });
-  if (!res.ok) throw new Error('Could not fetch MatchTrak standings');
-  const html = await res.text();
-  return parseHTMLTable(html);
+  for (const csvUrl of csvEndpoints) {
+    try {
+      console.log('Trying CSV:', csvUrl);
+      const res = await fetch(csvUrl, { headers: { 'User-Agent': UA } });
+      if (res.ok) {
+        const text = await res.text();
+        console.log('CSV response length:', text.length);
+        if (text.length > 50) {
+          const parsed = parseMatchTrakCSV(text);
+          if (parsed && parsed.length > 0) return parsed;
+        }
+      }
+    } catch (e) {
+      console.log('CSV endpoint failed:', csvUrl, e.message);
+    }
+  }
+
+  const htmlEndpoints = [
+    `${base}/11/main.nsf/standings-circuit?openview&count=1000&ExpandView`,
+    `${base}/main.nsf/standings?openview`,
+    url,
+  ];
+
+  for (const htmlUrl of htmlEndpoints) {
+    try {
+      console.log('Trying HTML:', htmlUrl);
+      const res = await fetch(htmlUrl, { headers: { 'User-Agent': UA } });
+      if (res.ok) {
+        const html = await res.text();
+        console.log('HTML response length:', html.length);
+        const parsed = parseHTMLTable(html);
+        if (parsed && parsed.length > 0) return parsed;
+      }
+    } catch (e) {
+      console.log('HTML endpoint failed:', htmlUrl, e.message);
+    }
+  }
+
+  throw new Error('Could not find standings on this MatchTrak page. Try pasting the direct standings URL.');
 }
 
 function parseMatchTrakCSV(csv: string) {
@@ -152,6 +182,43 @@ function parseHTMLTable(html: string) {
   return rows.length > 0 ? rows : null;
 }
 
+// ─── MatchTrak Division List ──────────────────────────────────
+async function fetchMatchTrakDivisions(url: string) {
+  const parsedUrl = new URL(url);
+  const subdomain = parsedUrl.hostname.split('.')[0];
+  const base = `https://${subdomain}.matchtrak.com`;
+
+  const circuitUrl = `${base}/11/main.nsf/standings-circuit?openview&count=1000&ExpandView`;
+  const res = await fetch(circuitUrl, { headers: { 'User-Agent': UA } });
+  if (!res.ok) throw new Error('Could not fetch MatchTrak divisions');
+  const html = await res.text();
+
+  const divisionRegex = /RestrictToCategory=([a-z0-9\-]+)/gi;
+  const seen = new Set<string>();
+  const divisions: { id: string; label: string; url: string }[] = [];
+
+  let match;
+  while ((match = divisionRegex.exec(html)) !== null) {
+    const categoryId = match[1];
+    if (seen.has(categoryId)) continue;
+    seen.add(categoryId);
+
+    const parts = categoryId.split('-');
+    const divPart = parts[parts.length - 1];
+    const gender = divPart.startsWith('b') ? 'Boys' : divPart.startsWith('g') ? 'Girls' : '';
+    const age = divPart.replace(/[a-z]/g, '').trim();
+    const label = gender && age ? `${gender} U${age}` : divPart.toUpperCase();
+
+    divisions.push({
+      id: categoryId,
+      label,
+      url: `${base}/11/main.nsf/standings-circuit?openview&count=1000&ExpandView&RestrictToCategory=${categoryId}`,
+    });
+  }
+
+  return divisions.length > 0 ? divisions : null;
+}
+
 // ─── Platform Detection ───────────────────────────────────────
 function detectPlatform(url: string): string {
   if (url.includes('matchtrak.com')) return 'matchtrak';
@@ -165,12 +232,47 @@ serve(async (req) => {
 
   try {
     const { url, teamId, save } = await req.json();
+    console.log('scrape-standings called with URL:', url);
     const platform = detectPlatform(url);
 
-    let standings = null;
     if (platform === 'matchtrak') {
-      standings = await fetchMatchTrak(url);
-    } else if (platform === 'teamsideline') {
+      const isHomepage = !url.includes('RestrictToCategory');
+
+      if (isHomepage) {
+        const divisions = await fetchMatchTrakDivisions(url);
+        if (!divisions || divisions.length === 0) {
+          throw new Error('Could not find divisions on this MatchTrak page');
+        }
+        return new Response(
+          JSON.stringify({ divisions, needsDivisionPick: true }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      const standings = await fetchMatchTrak(url);
+      if (!standings || standings.length === 0) {
+        throw new Error('No standings found for this division');
+      }
+      if (save && teamId) {
+        const supabase = createClient(
+          Deno.env.get('SUPABASE_URL') ?? '',
+          Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+        );
+        await supabase.from('standings').upsert({
+          team_id: teamId,
+          mode: platform,
+          table_data: standings,
+          updated_at: new Date().toISOString(),
+        });
+      }
+      return new Response(
+        JSON.stringify({ standings, platform }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    let standings = null;
+    if (platform === 'teamsideline') {
       standings = await fetchTeamSideline(url);
     } else {
       const res = await fetch(url, { headers: { 'User-Agent': UA } });
@@ -201,6 +303,7 @@ serve(async (req) => {
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   } catch (error) {
+    console.error('scrape-standings error:', error.message, error.stack);
     return new Response(
       JSON.stringify({ error: error.message }),
       { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
