@@ -35,17 +35,25 @@ export default function StandingsPage({ team }) {
 
   async function fetchStandings(overrideUrl = null) {
     const fetchUrl = overrideUrl || url
-    if (!fetchUrl.trim()) return
+    console.log('fetchStandings called with:', fetchUrl)
+    if (!fetchUrl.trim()) {
+      console.log('URL is empty, returning')
+      return
+    }
     setLoading(true)
     setError(null)
     setDivisions(null)
     try {
+      console.log('Invoking scrape-standings with URL:', fetchUrl)
       const { data, error: fnError } = await supabase.functions.invoke('scrape-standings', {
-        body: { url: fetchUrl.trim(), teamId: team.id, save: !!overrideUrl || !overrideUrl },
+        body: { url: fetchUrl.trim(), teamId: team.id, save: true },
       })
+      console.log('Response data:', data)
+      console.log('Response error:', fnError)
       if (fnError || data?.error) throw new Error(data?.error || fnError?.message || 'Failed to fetch standings')
 
       if (data?.needsDivisionPick) {
+        console.log('Divisions found:', data.divisions)
         setDivisions(data.divisions)
         return
       }
@@ -54,6 +62,7 @@ export default function StandingsPage({ team }) {
       setPlatform(data.platform)
       setDivisions(null)
     } catch (err) {
+      console.error('fetchStandings error:', err.message)
       setError(err.message)
     } finally {
       setLoading(false)
