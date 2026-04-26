@@ -3,6 +3,6 @@
   "target": {
     "namespace": "android_app",
     "package_name": "com.gavamotion.squadiq",
-    "sha256_cert_fingerprints": ["A8:4D:23:CB:3E:3D:5B:8A:FA:4E:22:97:EE:C4:2B:42:14:1B:45:AD:9A:D4:9D:BD:0A:C3:C2:32:F3:67:3F:44"]
+    "sha256_cert_fingerprints": ["A8:4D:23:CB:3E:3D:5B:8A:FA:4E:22:97:EE:C4:2B:42:14:1B:45:AD:9A:D4:9D:BD:0A:C3:C2:32:F3:67:3F:44", "2E:2F:7C:92:A6:A7:14:FA:16:07:87:5F:FC:DE:96:47:9E:C1:7B:84:74:41:E2:A0:B5:87:AB:90:F0:31:D6:83"]
   }
 }]
