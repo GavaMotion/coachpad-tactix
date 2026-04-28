@@ -29,7 +29,7 @@ function blankQuarterData(formation) {
 // ─── Main component ───────────────────────────────────────────────
 export default function GameDayPage() {
   const {
-    team, players,
+    team, players, teams, switchTeam,
     teamRef, teamIdRef,
     dataLoaded, loadError,
     gdPlans:        plans,        setGdPlans:        setPlans,
@@ -841,6 +841,51 @@ export default function GameDayPage() {
   // ─── Render ───────────────────────────────────────────────────
   return (
     <div className="flex flex-col" style={{ flex: 1, minHeight: 0, overflow: 'clip', background: '#0d1117' }}>
+
+      {/* Team selector — shown when there are multiple teams */}
+      {teams && teams.length > 1 && (
+        <div style={{
+          display: 'flex',
+          gap: 8,
+          overflowX: 'auto',
+          padding: '8px 12px',
+          scrollbarWidth: 'none',
+          borderBottom: '1px solid rgba(255,255,255,0.08)',
+          background: 'var(--bg-secondary)',
+        }}>
+          {teams.map(t => (
+            <button
+              key={t.id}
+              onClick={() => switchTeam(t.id)}
+              style={{
+                flexShrink: 0,
+                padding: '8px 16px',
+                borderRadius: 20,
+                border: `2px solid ${t.id === team?.id ? (t.color_primary || '#00c853') : 'rgba(255,255,255,0.1)'}`,
+                background: t.id === team?.id ? `${t.color_primary || '#00c853'}22` : 'rgba(255,255,255,0.04)',
+                color: t.id === team?.id ? (t.color_primary || '#00c853') : 'rgba(255,255,255,0.5)',
+                fontSize: 13,
+                fontWeight: t.id === team?.id ? 700 : 400,
+                cursor: 'pointer',
+                whiteSpace: 'nowrap',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6,
+              }}
+            >
+              <div style={{
+                width: 18, height: 18, borderRadius: '50%',
+                background: t.color_primary || '#00c853',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: 9, fontWeight: 700, color: '#fff', flexShrink: 0,
+              }}>
+                {t.name?.charAt(0).toUpperCase()}
+              </div>
+              {t.name}
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* ══ Row 1: Header ══ */}
       {isWide ? (

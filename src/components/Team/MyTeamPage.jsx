@@ -68,6 +68,7 @@ export default function MyTeamPage({ onSignOut, onCreateTeam, onShowOnboarding, 
     userId,
     deleteTeam: ctxDeleteTeam,
     subscription,
+    switchTeam,
   } = useApp()
   const { addToast } = useToast()
   const { session } = useAuth()
@@ -341,6 +342,50 @@ export default function MyTeamPage({ onSignOut, onCreateTeam, onShowOnboarding, 
   return (
     <div className="flex-1 overflow-y-auto bg-gray-950 pb-6">
       <div className="max-w-lg mx-auto px-4 pt-6 space-y-6">
+
+        {/* Team selector — shown when there are multiple teams */}
+        {teams.length > 1 && (
+          <div style={{
+            display: 'flex',
+            gap: 8,
+            overflowX: 'auto',
+            paddingBottom: 4,
+            scrollbarWidth: 'none',
+            marginBottom: 8,
+          }}>
+            {teams.map(t => (
+              <button
+                key={t.id}
+                onClick={() => switchTeam(t.id)}
+                style={{
+                  flexShrink: 0,
+                  padding: '8px 16px',
+                  borderRadius: 20,
+                  border: `2px solid ${t.id === team?.id ? (t.color_primary || '#00c853') : 'rgba(255,255,255,0.1)'}`,
+                  background: t.id === team?.id ? `${t.color_primary || '#00c853'}22` : 'rgba(255,255,255,0.04)',
+                  color: t.id === team?.id ? (t.color_primary || '#00c853') : 'rgba(255,255,255,0.5)',
+                  fontSize: 13,
+                  fontWeight: t.id === team?.id ? 700 : 400,
+                  cursor: 'pointer',
+                  whiteSpace: 'nowrap',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 6,
+                }}
+              >
+                <div style={{
+                  width: 18, height: 18, borderRadius: '50%',
+                  background: t.color_primary || '#00c853',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: 9, fontWeight: 700, color: '#fff', flexShrink: 0,
+                }}>
+                  {t.name?.charAt(0).toUpperCase()}
+                </div>
+                {t.name}
+              </button>
+            ))}
+          </div>
+        )}
 
         {/* My Team header with + New team button */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>

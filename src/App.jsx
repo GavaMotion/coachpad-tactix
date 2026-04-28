@@ -201,6 +201,7 @@ function TeamSwitcher() {
   const [open,        setOpen]        = useState(false)
   const [showNewTeam, setShowNewTeam] = useState(false)
   const dropdownRef = useRef(null)
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768
 
   // Click-outside to close (mouse + touch for mobile)
   useEffect(() => {
@@ -255,7 +256,97 @@ function TeamSwitcher() {
           </svg>
         </button>
 
-        {open && (
+        {open && isMobile ? (
+          <div
+            onClick={() => setOpen(false)}
+            style={{
+              position: 'fixed',
+              inset: 0,
+              background: 'rgba(0,0,0,0.7)',
+              zIndex: 9998,
+              display: 'flex',
+              alignItems: 'flex-end',
+            }}
+          >
+            <div
+              onClick={e => e.stopPropagation()}
+              style={{
+                background: 'var(--bg-panel)',
+                border: '1px solid var(--border-purple)',
+                borderRadius: '20px 20px 0 0',
+                width: '100%',
+                padding: '16px 0 32px',
+              }}
+            >
+              <div style={{ color: 'rgba(255,255,255,0.4)', fontSize: 12, fontWeight: 600, textAlign: 'center', marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                Switch Team
+              </div>
+              {teams.map(t => {
+                const isActive = t.id === activeTeamId;
+                return (
+                  <button
+                    key={t.id}
+                    onClick={() => { switchTeam(t.id); setOpen(false); }}
+                    style={{
+                      width: '100%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 12,
+                      padding: '14px 24px',
+                      background: isActive ? 'rgba(255,255,255,0.06)' : 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      textAlign: 'left',
+                    }}
+                  >
+                    <div style={{
+                      width: 36, height: 36, borderRadius: '50%',
+                      background: t.color_primary || '#00c853',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontSize: 14, fontWeight: 700, color: '#fff', flexShrink: 0,
+                    }}>
+                      {t.name?.charAt(0).toUpperCase()}
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ color: '#fff', fontSize: 15, fontWeight: isActive ? 700 : 400 }}>{t.name}</div>
+                      <div style={{ color: 'rgba(255,255,255,0.4)', fontSize: 12 }}>{t.division}</div>
+                    </div>
+                    {isActive && (
+                      <div style={{ width: 10, height: 10, borderRadius: '50%', background: t.color_primary || '#00c853' }} />
+                    )}
+                  </button>
+                );
+              })}
+              <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)', marginTop: 8 }}>
+                <button
+                  onClick={() => {
+                    setOpen(false);
+                    if (teams.length >= maxTeams) {
+                      addToast(`Your plan allows up to ${maxTeams} team${maxTeams === 1 ? '' : 's'}`, 'warning', 4000);
+                      return;
+                    }
+                    setShowNewTeam(true);
+                  }}
+                  style={{
+                    width: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 12,
+                    padding: '14px 24px',
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                    color: '#00c853',
+                    fontSize: 15,
+                    fontWeight: 600,
+                  }}
+                >
+                  + New Team
+                </button>
+              </div>
+            </div>
+          </div>
+        ) : open && (
           <div
             className="absolute left-0 top-full mt-1 rounded-xl shadow-2xl overflow-hidden"
             style={{ background: 'var(--bg-panel)', border: '1px solid var(--border-purple)', minWidth: 200, zIndex: 9999 }}
