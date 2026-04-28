@@ -211,10 +211,10 @@ function TeamSwitcher() {
       }
     }
     document.addEventListener('mousedown', handleOutside)
-    document.addEventListener('touchstart', handleOutside)
+    document.addEventListener('touchend', handleOutside)
     return () => {
       document.removeEventListener('mousedown', handleOutside)
-      document.removeEventListener('touchstart', handleOutside)
+      document.removeEventListener('touchend', handleOutside)
     }
   }, [open])
 
@@ -267,7 +267,12 @@ function TeamSwitcher() {
                 <button
                   key={t.id}
                   onClick={() => { switchTeam(t.id); setOpen(false) }}
-                  onTouchEnd={(e) => { e.preventDefault(); switchTeam(t.id); setOpen(false) }}
+                  onTouchEnd={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    switchTeam(t.id)
+                    setOpen(false)
+                  }}
                   className="w-full flex items-center gap-2.5 px-3 py-2.5 text-sm text-left transition"
                   onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.06)')}
                   onMouseLeave={e => (e.currentTarget.style.background = 'none')}
@@ -303,7 +308,19 @@ function TeamSwitcher() {
                   }
                   setShowNewTeam(true)
                 }}
-                onTouchEnd={(e) => { e.preventDefault(); setOpen(false); if (teams.length >= maxTeams) { addToast(isTrialExpired ? 'Your trial has expired — upgrade to add teams' : `Your plan allows up to ${maxTeams} team${maxTeams === 1 ? '' : 's'} — upgrade to add more`, 'warning', 4000); return } setShowNewTeam(true); }}
+                onTouchEnd={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  setOpen(false)
+                  if (teams.length >= maxTeams) {
+                    addToast(isTrialExpired
+                      ? 'Your trial has expired — upgrade to add teams'
+                      : `Your plan allows up to ${maxTeams} team${maxTeams === 1 ? '' : 's'} — upgrade to add more`,
+                      'warning', 4000)
+                    return
+                  }
+                  setShowNewTeam(true)
+                }}
                 className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-left transition"
                 onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.06)')}
                 onMouseLeave={e => (e.currentTarget.style.background = 'none')}
