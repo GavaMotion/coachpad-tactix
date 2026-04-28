@@ -18,35 +18,82 @@ const DIVISIONS = ['8U', '10U', '12U', '14U', '16U', '19U']
 function DeleteTeamDialog({ teamName, onConfirm, onCancel }) {
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center px-4"
-      style={{ background: 'rgba(0,0,0,0.75)' }}
+      style={{
+        position: 'fixed', inset: 0,
+        background: 'rgba(0,0,0,0.85)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        zIndex: 9999, padding: 24,
+      }}
       onClick={onCancel}
     >
       <div
-        className="rounded-2xl p-6 w-full max-w-sm shadow-2xl"
-        style={{ background: 'var(--bg-panel)', border: '1px solid rgba(153,27,27,0.6)' }}
+        style={{
+          background: '#1a1a2e',
+          border: '1px solid rgba(220,50,50,0.3)',
+          borderRadius: 20, padding: 28,
+          width: '100%', maxWidth: 360,
+          display: 'flex', flexDirection: 'column', gap: 16,
+        }}
         onClick={e => e.stopPropagation()}
       >
-        <h3 className="text-white font-bold text-base mb-2">Delete team?</h3>
-        <p className="text-gray-400 text-sm mb-5">
-          This will permanently delete <strong className="text-white">{teamName}</strong> and all its players,
-          game plans, and practice plans. This cannot be undone.
-        </p>
-        <div className="flex gap-3">
-          <button
-            onClick={onConfirm}
-            className="flex-1 py-2.5 rounded-xl font-semibold text-white transition"
-            style={{ background: '#991b1b' }}
-            onMouseEnter={e => (e.currentTarget.style.background = '#b91c1c')}
-            onMouseLeave={e => (e.currentTarget.style.background = '#991b1b')}
-          >
-            Delete
-          </button>
+        {/* Warning icon */}
+        <div style={{ textAlign: 'center', fontSize: 44 }}>⚠️</div>
+
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ color: '#fff', fontSize: 18, fontWeight: 700, marginBottom: 8 }}>
+            Delete {teamName}?
+          </div>
+          <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: 13, lineHeight: 1.6 }}>
+            This will permanently delete your team and <span style={{ color: '#E24B4A', fontWeight: 600 }}>all associated data</span> including:
+          </div>
+        </div>
+
+        {/* What gets deleted */}
+        <div style={{
+          background: 'rgba(220,50,50,0.08)',
+          border: '1px solid rgba(220,50,50,0.2)',
+          borderRadius: 10, padding: '12px 16px',
+          display: 'flex', flexDirection: 'column', gap: 6,
+        }}>
+          {['All players and rosters', 'All lineup plans', 'All practice plans', 'All tactical sketches', 'All standings'].map(item => (
+            <div key={item} style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'rgba(255,255,255,0.6)', fontSize: 13 }}>
+              <span style={{ color: '#E24B4A', fontSize: 16 }}>✕</span>
+              {item}
+            </div>
+          ))}
+        </div>
+
+        <div style={{
+          background: 'rgba(220,50,50,0.06)',
+          borderRadius: 8, padding: '10px 14px',
+          color: '#E24B4A', fontSize: 12,
+          textAlign: 'center', fontWeight: 600,
+        }}>
+          This action cannot be undone
+        </div>
+
+        {/* Buttons */}
+        <div style={{ display: 'flex', gap: 10 }}>
           <button
             onClick={onCancel}
-            className="flex-1 py-2.5 rounded-xl border border-gray-700 text-gray-300 hover:text-white hover:border-gray-500 transition font-medium"
+            style={{
+              flex: 1, background: 'rgba(255,255,255,0.06)',
+              border: '1px solid rgba(255,255,255,0.1)',
+              borderRadius: 10, padding: '12px',
+              color: '#fff', fontSize: 14, cursor: 'pointer',
+            }}
           >
             Cancel
+          </button>
+          <button
+            onClick={onConfirm}
+            style={{
+              flex: 1, background: 'rgba(220,50,50,0.8)',
+              border: 'none', borderRadius: 10, padding: '12px',
+              color: '#fff', fontSize: 14, fontWeight: 700, cursor: 'pointer',
+            }}
+          >
+            Delete Forever
           </button>
         </div>
       </div>
