@@ -503,6 +503,13 @@ export function AppProvider({ userId, children }) {
 
   // ── Create a new team and switch to it ────────────────────────
   async function createTeam(name, division, branding = {}) {
+    // Debug
+    console.log('createTeam called:', {
+      teamsLength: teams.length,
+      maxTeams,
+      plan: subscription?.plan,
+      plan_override: subscription?.plan_override,
+    });
     // Enforce team limit
     if (teams.length >= maxTeams) {
       throw new Error(`Your plan allows up to ${maxTeams} team${maxTeams === 1 ? '' : 's'}. Upgrade to add more.`)
