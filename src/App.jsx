@@ -202,14 +202,20 @@ function TeamSwitcher() {
   const [showNewTeam, setShowNewTeam] = useState(false)
   const dropdownRef = useRef(null)
 
-  // Click-outside to close
+  // Click-outside to close (mouse + touch for mobile)
   useEffect(() => {
     if (!open) return
-    function onDown(e) {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) setOpen(false)
+    function handleOutside(e) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setOpen(false)
+      }
     }
-    document.addEventListener('mousedown', onDown)
-    return () => document.removeEventListener('mousedown', onDown)
+    document.addEventListener('mousedown', handleOutside)
+    document.addEventListener('touchstart', handleOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleOutside)
+      document.removeEventListener('touchstart', handleOutside)
+    }
   }, [open])
 
   if (teams.length === 0 && !showNewTeam) {
@@ -252,7 +258,7 @@ function TeamSwitcher() {
         {open && (
           <div
             className="absolute left-0 top-full mt-1 rounded-xl shadow-2xl overflow-hidden"
-            style={{ background: 'var(--bg-panel)', border: '1px solid var(--border-purple)', minWidth: 200, zIndex: 200 }}
+            style={{ background: 'var(--bg-panel)', border: '1px solid var(--border-purple)', minWidth: 200, zIndex: 9999 }}
           >
             {teams.map(t => {
               const isActive = t.id === activeTeamId
@@ -261,6 +267,7 @@ function TeamSwitcher() {
                 <button
                   key={t.id}
                   onClick={() => { switchTeam(t.id); setOpen(false) }}
+                  onTouchEnd={(e) => { e.preventDefault(); switchTeam(t.id); setOpen(false) }}
                   className="w-full flex items-center gap-2.5 px-3 py-2.5 text-sm text-left transition"
                   onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.06)')}
                   onMouseLeave={e => (e.currentTarget.style.background = 'none')}
@@ -296,6 +303,7 @@ function TeamSwitcher() {
                   }
                   setShowNewTeam(true)
                 }}
+                onTouchEnd={(e) => { e.preventDefault(); setOpen(false); if (teams.length >= maxTeams) { addToast(isTrialExpired ? 'Your trial has expired — upgrade to add teams' : `Your plan allows up to ${maxTeams} team${maxTeams === 1 ? '' : 's'} — upgrade to add more`, 'warning', 4000); return } setShowNewTeam(true); }}
                 className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-left transition"
                 onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.06)')}
                 onMouseLeave={e => (e.currentTarget.style.background = 'none')}
