@@ -796,6 +796,15 @@ export default function SketchPage() {
                 <button
                   onClick={() => setActiveSketchId(s.id)}
                   onDoubleClick={() => { setEditingTabId(s.id); setEditingName(s.name) }}
+                  onTouchStart={() => {
+                    const timer = setTimeout(() => {
+                      setEditingTabId(s.id);
+                      setEditingName(s.name);
+                    }, 600);
+                    s._pressTimer = timer;
+                  }}
+                  onTouchEnd={() => { if (s._pressTimer) clearTimeout(s._pressTimer); }}
+                  onTouchMove={() => { if (s._pressTimer) clearTimeout(s._pressTimer); }}
                   style={{
                     flex: 1, minWidth: 0, padding: '0 4px 0 8px',
                     fontSize: 11, fontWeight: isActive ? 600 : 400,
@@ -824,6 +833,11 @@ export default function SketchPage() {
           onMouseLeave={e => (e.currentTarget.style.color = '#6b7280')}
           title="New sketch"
         >+</button>
+      </div>
+
+      {/* Hint for renaming */}
+      <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.2)', paddingLeft: 2, paddingBottom: 4 }}>
+        Double-tap or long-press a tab to rename
       </div>
 
       {/* Delete confirmation bar */}
