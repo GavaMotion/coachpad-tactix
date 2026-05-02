@@ -86,10 +86,10 @@ function getOpponentColor(primaryHex) {
 }
 
 // ── Player helpers ────────────────────────────────────────────────
-function buildMyPlayers(players, gdPlanStates, gdActivePlanId) {
-  const q1 = gdPlanStates?.[gdActivePlanId]?.quarters?.[1]
-  const formation = q1?.formation
-  const slots = q1?.slots || {}
+function buildMyPlayers(players, gdPlanStates, gdActivePlanId, quarter = 1) {
+  const qData = gdPlanStates?.[gdActivePlanId]?.quarters?.[quarter]
+  const formation = qData?.formation
+  const slots = qData?.slots || {}
   return players.map(p => {
     const slotEntry = formation && Object.entries(slots).find(([, pid]) => pid === p.id)
     const slot = slotEntry && formation.slots.find(s => s.id === slotEntry[0])
@@ -229,6 +229,7 @@ export default function SketchPage() {
   // ── UI ─────────────────────────────────────────────────────────
   const [drawColor,       setDrawColor]       = useState('white')
   const [selectedArrowId, setSelectedArrowId] = useState(null)
+  const [showLoadQMenu,   setShowLoadQMenu]   = useState(false)
   const [interaction,     setInteractionSt]   = useState(null)
   const interactionRef = useRef(null)
   function setInteraction(val) {
@@ -711,11 +712,11 @@ export default function SketchPage() {
     scheduleSave()
   }
 
-  function handleLoadQ1() {
+  function handleLoadQuarter(q) {
     saveSnapshot()
-    const gdQ1FormId = gdPlanStates?.[gdActivePlanId]?.quarters?.[1]?.formation?.id || null
-    updateSketch(state => ({ ...state, myPlayers: buildMyPlayers(players, gdPlanStates, gdActivePlanId) }))
-    if (gdQ1FormId) setMyFormationIds(prev => ({ ...prev, [activeSketchId]: gdQ1FormId }))
+    const gdQFormId = gdPlanStates?.[gdActivePlanId]?.quarters?.[q]?.formation?.id || null
+    updateSketch(state => ({ ...state, myPlayers: buildMyPlayers(players, gdPlanStates, gdActivePlanId, q) }))
+    if (gdQFormId) setMyFormationIds(prev => ({ ...prev, [activeSketchId]: gdQFormId }))
     scheduleSave()
   }
 
@@ -942,10 +943,40 @@ export default function SketchPage() {
         >↪</button>
 
         {/* Utility buttons */}
-        <button onClick={handleLoadQ1} title="Load Q1 lineup onto field"
-          style={{ height: 28, padding: '0 8px', borderRadius: 6, fontSize: 11, background: 'rgba(255,255,255,0.06)', color: '#9ca3af', border: '1px solid #374151', cursor: 'pointer', whiteSpace: 'nowrap' }}>
-          {isMobile ? '↺Q1' : '↺ Q1 lineup'}
-        </button>
+        <div style={{ position: 'relative' }}>
+          <button onClick={() => setShowLoadQMenu(s => !s)} title="Load a quarter lineup onto field"
+            style={{ height: 28, padding: '0 8px', borderRadius: 6, fontSize: 11, background: 'rgba(255,255,255,0.06)', color: '#9ca3af', border: '1px solid #374151', cursor: 'pointer', whiteSpace: 'nowrap' }}>
+            {isMobile ? '↺Q' : '↺ Load Q'}
+          </button>
+          {showLoadQMenu && (
+            <>
+              <div onClick={() => setShowLoadQMenu(false)}
+                style={{ position: 'fixed', inset: 0, zIndex: 49 }} />
+              <div style={{
+                position: 'absolute', top: '100%', right: 0, marginTop: 4,
+                background: '#1a1a2e', border: '1px solid rgba(255,255,255,0.15)',
+                borderRadius: 6, padding: 4, display: 'flex', gap: 4, zIndex: 50,
+                boxShadow: '0 4px 12px rgba(0,0,0,0.5)',
+              }}>
+                {[1, 2, 3, 4].map(q => (
+                  <button key={q}
+                    onClick={() => { handleLoadQuarter(q); setShowLoadQMenu(false) }}
+                    style={{
+                      height: 26, minWidth: 30, padding: '0 8px', borderRadius: 5,
+                      fontSize: 11, fontWeight: 600,
+                      background: 'rgba(255,255,255,0.06)',
+                      color: '#d1d5db',
+                      border: '1px solid #374151',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    Q{q}
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
+        </div>
         <button onClick={handleClearArrows} title="Clear all arrows"
           style={{ height: 28, padding: '0 8px', borderRadius: 6, fontSize: 11, background: 'rgba(255,255,255,0.06)', color: '#9ca3af', border: '1px solid #374151', cursor: 'pointer', whiteSpace: 'nowrap' }}>
           {isMobile ? '✕↗' : '✕ Arrows'}
