@@ -3,6 +3,7 @@ import { supabase } from '../../lib/supabase'
 import { useApp, applyTeamCSSVars } from '../../contexts/AppContext'
 import { useAuth } from '../../contexts/AuthContext'
 import { useToast } from '../UI/Toast'
+import { getContrastTextColor } from '../../lib/utils'
 import theme from '../../theme'
 import PlayerCard from './PlayerCard'
 import AddPlayerModal from './AddPlayerModal'
@@ -424,7 +425,7 @@ export default function MyTeamPage({ onSignOut, onCreateTeam, onShowOnboarding, 
                   width: 18, height: 18, borderRadius: '50%',
                   background: t.color_primary || '#00c853',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 9, fontWeight: 700, color: '#fff', flexShrink: 0,
+                  fontSize: 9, fontWeight: 700, color: getContrastTextColor(t.color_primary || '#00c853'), flexShrink: 0,
                 }}>
                   {t.name?.charAt(0).toUpperCase()}
                 </div>
@@ -529,8 +530,8 @@ export default function MyTeamPage({ onSignOut, onCreateTeam, onShowOnboarding, 
                     <button
                       type="submit"
                       disabled={savingTeam}
-                      className="flex-1 py-2.5 rounded-lg font-semibold text-white transition disabled:opacity-60"
-                      style={{ backgroundColor: 'var(--team-primary, #1a5c2e)' }}
+                      className="flex-1 py-2.5 rounded-lg font-semibold transition disabled:opacity-60"
+                      style={{ backgroundColor: 'var(--team-primary, #1a5c2e)', color: 'var(--team-primary-text, #fff)' }}
                     >
                       {savingTeam ? 'Saving…' : 'Save Changes'}
                     </button>
@@ -552,7 +553,7 @@ export default function MyTeamPage({ onSignOut, onCreateTeam, onShowOnboarding, 
                     border: '2px solid rgba(255,255,255,0.15)',
                     boxShadow: '0 4px 20px rgba(0,0,0,0.4)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: 32, fontWeight: 700, color: '#fff',
+                    fontSize: 32, fontWeight: 700, color: getContrastTextColor(team?.color_primary || '#1a5c2e'),
                   }}>
                     {team?.name?.charAt(0)?.toUpperCase() || '?'}
                   </div>
@@ -625,8 +626,8 @@ export default function MyTeamPage({ onSignOut, onCreateTeam, onShowOnboarding, 
                   <h3 className="text-lg font-bold text-white">Roster</h3>
                   <button
                     onClick={() => { setEditingPlayer(null); setShowModal(true) }}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold text-white transition"
-                    style={{ backgroundColor: 'var(--team-primary, #1a5c2e)' }}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold transition"
+                    style={{ backgroundColor: 'var(--team-primary, #1a5c2e)', color: 'var(--team-primary-text, #fff)' }}
                     onMouseEnter={e => (e.currentTarget.style.opacity = '0.85')}
                     onMouseLeave={e => (e.currentTarget.style.opacity = '1')}
                   >

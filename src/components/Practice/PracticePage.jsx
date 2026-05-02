@@ -3,6 +3,7 @@ import html2canvas from 'html2canvas'
 import { supabase } from '../../lib/supabase'
 import { useApp } from '../../contexts/AppContext'
 import { useToast } from '../UI/Toast'
+import { getContrastTextColor } from '../../lib/utils'
 import {
   DRILLS, CATEGORY_META, CATEGORY_ORDER, PHASE_META,
   DIVISIONS_ORDER, matchesDivision,
@@ -989,7 +990,7 @@ export default function PracticePage() {
                   width: 40, height: 40, borderRadius: '50%', flexShrink: 0,
                   background: team?.color_primary || '#00c853',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 16, fontWeight: 700, color: '#fff',
+                  fontSize: 16, fontWeight: 700, color: getContrastTextColor(team?.color_primary || '#00c853'),
                 }}>
                   {team?.name?.charAt(0)?.toUpperCase() || '?'}
                 </div>

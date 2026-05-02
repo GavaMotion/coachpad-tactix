@@ -5,6 +5,7 @@ import theme from './theme'
 import { AppProvider, useApp, getCachedAge } from './contexts/AppContext'
 import { useOnlineStatus } from './hooks/useOnlineStatus'
 import { supabase } from './lib/supabase'
+import { getContrastTextColor } from './lib/utils'
 import { getStripe, PRICE_IDS } from './lib/stripe'
 import AuthPage from './components/Auth/AuthPage'
 import Onboarding from './components/Onboarding/Onboarding'
@@ -224,7 +225,7 @@ function TeamSwitcher() {
       <button
         onClick={() => setShowNewTeam(true)}
         className="flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-lg transition"
-        style={{ background: 'var(--team-primary, #1a5c2e)', color: '#fff' }}
+        style={{ background: 'var(--team-primary, #1a5c2e)', color: 'var(--team-primary-text, #fff)' }}
       >
         + New Team
       </button>
@@ -245,7 +246,7 @@ function TeamSwitcher() {
               width: 24, height: 24, borderRadius: '50%', flexShrink: 0,
               background: team?.color_primary || '#1a5c2e',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 11, fontWeight: 700, color: '#fff',
+              fontSize: 11, fontWeight: 700, color: getContrastTextColor(team?.color_primary || '#1a5c2e'),
             }}>
               {team?.name?.charAt(0).toUpperCase() || '?'}
             </div>
@@ -303,7 +304,7 @@ function TeamSwitcher() {
                       width: 36, height: 36, borderRadius: '50%',
                       background: t.color_primary || '#00c853',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontSize: 14, fontWeight: 700, color: '#fff', flexShrink: 0,
+                      fontSize: 14, fontWeight: 700, color: getContrastTextColor(t.color_primary || '#00c853'), flexShrink: 0,
                     }}>
                       {t.name?.charAt(0).toUpperCase()}
                     </div>

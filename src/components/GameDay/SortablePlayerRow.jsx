@@ -70,8 +70,8 @@ export default function SortablePlayerRow({
 
       {/* Jersey badge */}
       <div
-        className="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-white font-bold"
-        style={{ fontSize: 11, background: 'var(--team-primary, #1a5c2e)' }}
+        className="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center font-bold"
+        style={{ fontSize: 11, background: 'var(--team-primary, #1a5c2e)', color: 'var(--team-primary-text, #fff)' }}
       >
         {player.jersey_number}
       </div>

@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useRef, useEffect, useCallback } from 'react'
 import { supabase } from '../lib/supabase'
 import { getDefaultFormation, getFormationById } from '../lib/formations'
+import { getContrastTextColor } from '../lib/utils'
 import { PLANS } from '../version'
 
 // ── Game Day helpers — exported so GameDayPage can import them ───
@@ -103,6 +104,8 @@ export function applyTeamCSSVars(teamData) {
   // Opacity aliases for backgrounds
   document.documentElement.style.setProperty('--team-primary-20', `rgba(${rgb},0.20)`)
   document.documentElement.style.setProperty('--team-primary-12', `rgba(${rgb},0.12)`)
+  // Contrast-aware text color for elements that use --team-primary as background
+  document.documentElement.style.setProperty('--team-primary-text', getContrastTextColor(primary))
 }
 
 // ── localStorage cache helpers ────────────────────────────────────

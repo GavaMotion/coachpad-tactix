@@ -26,8 +26,8 @@ export default function PlayerCard({ player, onEdit, onDelete }) {
       style={{ background: 'var(--bg-panel)', border: '1px solid var(--border-purple)' }}>
       {/* Jersey number badge */}
       <div
-        className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm"
-        style={{ backgroundColor: 'var(--team-primary, #1a5c2e)' }}
+        className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm"
+        style={{ backgroundColor: 'var(--team-primary, #1a5c2e)', color: 'var(--team-primary-text, #fff)' }}
       >
         {player.jersey_number}
       </div>

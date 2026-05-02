@@ -5,3 +5,19 @@ export function fmtTime(totalSec) {
   const ss = s % 60
   return `${m}:${ss.toString().padStart(2, '0')}`
 }
+
+/** Picks a dark or light text color for legibility on top of `bg`.
+ *  Uses YIQ perceived luminance with a strict mid-grey threshold (128) so any
+ *  color brighter than mid-grey gets dark text. */
+export function getContrastTextColor(bg, darkColor = '#0a0a0f', lightColor = '#ffffff') {
+  if (!bg || typeof bg !== 'string') return lightColor
+  let h = bg.trim().replace('#', '')
+  if (h.length === 3) h = h.split('').map(c => c + c).join('')
+  if (h.length !== 6) return lightColor
+  const r = parseInt(h.slice(0, 2), 16)
+  const g = parseInt(h.slice(2, 4), 16)
+  const b = parseInt(h.slice(4, 6), 16)
+  if ([r, g, b].some(Number.isNaN)) return lightColor
+  const yiq = (r * 299 + g * 587 + b * 114) / 1000
+  return yiq >= 128 ? darkColor : lightColor
+}

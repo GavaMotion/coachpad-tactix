@@ -90,6 +90,7 @@
   --team-primary-rgb: 0,200,83;
   --team-primary-20:  rgba(0,200,83,0.20);
   --team-primary-12:  rgba(0,200,83,0.12);
+  --team-primary-text: #ffffff;
 }
 
 @layer base {

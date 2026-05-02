@@ -79,11 +79,12 @@ function PlayerTag({ player, quarterStates, isOnFieldNow, totalPlanned, isMobile
 function TagRow({ players, getQStates, getTotalPlanned, onFieldSet, isMobile, dimmed, onDragStart, draggingPlayerId, shakingPlayerId }) {
   return (
     <div style={{
-      display:     'flex',
-      flexWrap:    'wrap',
-      gap:         5,
-      alignContent:'flex-start',
-      padding:     '4px 6px',
+      display:      'flex',
+      flexWrap:     'wrap',
+      gap:          5,
+      alignContent: 'flex-start',
+      padding:      '4px 6px',
+      flexShrink:   0,
     }}>
       {players.map(player => (
         <PlayerTag
@@ -111,6 +112,7 @@ export default function PlayerTagGrid({
   outAllIds,
   outQIds,
   isMobile,
+  fillHeight,
   onDragStart,
   draggingPlayerId,
   shakingPlayerId,
@@ -162,9 +164,13 @@ export default function PlayerTagGrid({
         background:    benchIsOver ? 'rgba(0,200,83,0.04)' : '#0d1117',
         borderTop:     '1px solid rgba(255,255,255,0.06)',
         transition:    'background 0.15s',
+        ...(fillHeight ? { flex: 1, minHeight: 0 } : {}),
       }}
     >
-      <div style={{ paddingBottom: 8 }}>
+      <div style={{
+        paddingBottom: 8,
+        ...(fillHeight ? { flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' } : {}),
+      }}>
 
         {/* ── Active quarter players ── */}
         {activePlayers.length > 0 && (
@@ -176,6 +182,7 @@ export default function PlayerTagGrid({
               textTransform: 'uppercase',
               letterSpacing: '0.08em',
               color:         'rgba(0,200,83,0.5)',
+              flexShrink:    0,
             }}>
               Q{viewedQuarter} FIELD · {activePlayers.length}
             </div>
@@ -199,6 +206,7 @@ export default function PlayerTagGrid({
           borderTop:  activePlayers.length > 0 ? '1px solid rgba(255,255,255,0.08)' : 'none',
           background: 'rgba(255,255,255,0.04)',
           minHeight:  40,
+          ...(fillHeight ? { flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' } : {}),
         }}>
           <div style={{
             padding:       '5px 8px 2px',
@@ -208,9 +216,12 @@ export default function PlayerTagGrid({
             letterSpacing: '0.08em',
             color:         benchIsOver ? 'rgba(0,200,83,0.6)' : 'rgba(255,255,255,0.55)',
             transition:    'color 0.15s',
+            flexShrink:    0,
           }}>
             BENCH Q{viewedQuarter} · {benchPlayers.length}
           </div>
+          {/* Spacer pushes bench tags to the bottom edge of the pane */}
+          {fillHeight && <div style={{ flex: 1, minHeight: 0 }} />}
           {benchPlayers.length === 0 ? (
             <p style={{
               fontSize:  11,
@@ -218,6 +229,7 @@ export default function PlayerTagGrid({
               fontStyle: 'italic',
               padding:   '4px 10px 8px',
               margin:    0,
+              flexShrink: 0,
             }}>
               All players on field
             </p>

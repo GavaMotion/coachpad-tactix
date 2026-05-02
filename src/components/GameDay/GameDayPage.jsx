@@ -4,6 +4,7 @@ import theme from '../../theme'
 import { supabase } from '../../lib/supabase'
 import { useApp, emptyPlan, buildBlankPlanState, planStateToQuarterData } from '../../contexts/AppContext'
 import { useToast } from '../UI/Toast'
+import { getContrastTextColor } from '../../lib/utils'
 import {
   FORMATIONS_BY_DIVISION,
   getDefaultFormation,
@@ -51,6 +52,9 @@ export default function GameDayPage() {
   const [toast,           setToast]            = useState(null)
   const [isWide,          setIsWide]           = useState(
     () => typeof window !== 'undefined' && window.innerWidth >= 768
+  )
+  const [isTablet,        setIsTablet]         = useState(
+    () => typeof window !== 'undefined' && window.innerWidth >= 768 && window.innerWidth < 1280
   )
   const [showShareSheet,  setShowShareSheet]  = useState(false)
   const [isExporting,     setIsExporting]     = useState(false)
@@ -101,7 +105,11 @@ export default function GameDayPage() {
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    function onResize() { setIsWide(window.innerWidth >= 768) }
+    function onResize() {
+      const w = window.innerWidth
+      setIsWide(w >= 768)
+      setIsTablet(w >= 768 && w < 1280)
+    }
     window.addEventListener('resize', onResize, { passive: true })
     return () => window.removeEventListener('resize', onResize)
   }, [])
@@ -877,7 +885,7 @@ export default function GameDayPage() {
                 width: 18, height: 18, borderRadius: '50%',
                 background: t.color_primary || '#00c853',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: 9, fontWeight: 700, color: '#fff', flexShrink: 0,
+                fontSize: 9, fontWeight: 700, color: getContrastTextColor(t.color_primary || '#00c853'), flexShrink: 0,
               }}>
                 {t.name?.charAt(0).toUpperCase()}
               </div>
@@ -939,7 +947,7 @@ export default function GameDayPage() {
               width: 24, height: 24, borderRadius: '50%', flexShrink: 0,
               background: team?.color_primary || 'var(--team-primary, #1a5c2e)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 10, fontWeight: 700, color: '#fff',
+              fontSize: 10, fontWeight: 700, color: getContrastTextColor(team?.color_primary || '#1a5c2e'),
             }}>
               {team.name?.charAt(0)?.toUpperCase() || '?'}
             </div>
@@ -1055,7 +1063,7 @@ export default function GameDayPage() {
 
         {/* ── Field pane ── */}
         <div style={{
-          flex:           isWide ? '0 0 60%' : '0 0 55%',
+          flex:           isWide ? (isTablet ? '0 0 38%' : '0 0 60%') : '0 0 55%',
           height:         isWide ? '100%' : undefined,
           display:        'flex',
           flexDirection:  'row',
@@ -1162,6 +1170,7 @@ export default function GameDayPage() {
             outAllIds={outAllIds}
             outQIds={outQIds}
             isMobile={!isWide}
+            fillHeight={isWide}
             onDragStart={onDragStart}
             draggingPlayerId={draggingPlayerId}
             shakingPlayerId={shakingPlayerId}
@@ -1311,7 +1320,7 @@ export default function GameDayPage() {
                         width: 28, height: 28, borderRadius: '50%', flexShrink: 0,
                         background: isAbsentAll ? 'rgba(220,50,50,0.3)' : (team?.color_primary || '#00c853'),
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        fontSize: 10, fontWeight: 700, color: '#fff',
+                        fontSize: 10, fontWeight: 700, color: isAbsentAll ? '#fff' : getContrastTextColor(team?.color_primary || '#00c853'),
                       }}>
                         {player.jersey_number}
                       </div>
@@ -1408,7 +1417,7 @@ export default function GameDayPage() {
                 width: 48, height: 48, borderRadius: '50%', flexShrink: 0,
                 background: team?.color_primary || '#00c853',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: 20, fontWeight: 700, color: '#fff',
+                fontSize: 20, fontWeight: 700, color: getContrastTextColor(team?.color_primary || '#00c853'),
               }}>
                 {team?.name?.charAt(0)?.toUpperCase() || '?'}
               </div>
@@ -1445,7 +1454,7 @@ export default function GameDayPage() {
                         return (
                           <div key={slotId} style={{ position: 'absolute', left: `${slot.x}%`, top: `${slot.y}%`, transform: 'translate(-50%, -50%)',
                             width: 28, height: 28, borderRadius: '50%', background: team?.color_primary || '#00c853',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 8, fontWeight: 700, textAlign: 'center', lineHeight: 1.1, flexDirection: 'column' }}>
+                            display: 'flex', alignItems: 'center', justifyContent: 'center', color: getContrastTextColor(team?.color_primary || '#00c853'), fontSize: 8, fontWeight: 700, textAlign: 'center', lineHeight: 1.1, flexDirection: 'column' }}>
                             <div>{player.jersey_number}</div>
                             <div style={{ fontSize: 6 }}>{player.name?.split(' ')[0]}</div>
                           </div>
@@ -1457,7 +1466,7 @@ export default function GameDayPage() {
                       <div style={{ fontSize: 9, color: '#00c853', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 4 }}>On field</div>
                       {players.filter(p => playingIds.has(p.id)).map(p => (
                         <div key={p.id} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: '#fff', marginBottom: 3 }}>
-                          <span style={{ width: 18, height: 18, borderRadius: '50%', background: team?.color_primary || '#00c853', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 8, fontWeight: 700, flexShrink: 0, color: '#fff' }}>
+                          <span style={{ width: 18, height: 18, borderRadius: '50%', background: team?.color_primary || '#00c853', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 8, fontWeight: 700, flexShrink: 0, color: getContrastTextColor(team?.color_primary || '#00c853') }}>
                             {p.jersey_number}
                           </span>
                           {p.name}
