@@ -1063,7 +1063,7 @@ export default function GameDayPage() {
 
         {/* ── Field pane ── */}
         <div style={{
-          flex:           isWide ? (isTablet ? '0 0 38%' : '0 0 60%') : '0 0 55%',
+          flex:           isWide ? (isTablet ? '0 0 30%' : '0 0 60%') : '0 0 55%',
           height:         isWide ? '100%' : undefined,
           display:        'flex',
           flexDirection:  'row',

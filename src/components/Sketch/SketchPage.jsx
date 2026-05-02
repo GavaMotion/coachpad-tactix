@@ -3,6 +3,7 @@ import { supabase } from '../../lib/supabase'
 import { useApp } from '../../contexts/AppContext'
 import theme from '../../theme'
 import { FORMATIONS_BY_DIVISION, getFormationById } from '../../lib/formations'
+import { getContrastTextColor } from '../../lib/utils'
 
 // ── Error boundary ────────────────────────────────────────────────
 class SketchErrorBoundary extends Component {
@@ -171,10 +172,14 @@ function SketchFieldSVG() {
 }
 
 // ── Player circle ─────────────────────────────────────────────────
-function PlayerCircle({ p, isOpp, color, size, isSelected, onPointerDown }) {
+function PlayerCircle({ p, isOpp, color, textColor, size, isSelected, onPointerDown }) {
   const label    = isOpp ? p.label    : String(p.jerseyNumber || '')
   const subLabel = isOpp ? 'OPP'      : (p.name ? p.name.split(' ')[0] : '')
   const sz       = size || 44
+  const txt      = textColor || '#fff'
+  // Sub-label is dimmed; lighten/darken depending on whether txt is light or dark.
+  const isDarkTxt = txt.startsWith('#0') || txt.toLowerCase().startsWith('#1') || txt.toLowerCase() === '#000' || txt.toLowerCase() === 'black'
+  const subTxt = isDarkTxt ? 'rgba(0,0,0,0.6)' : 'rgba(255,255,255,0.75)'
   return (
     <div
       onPointerDown={onPointerDown}
@@ -191,10 +196,10 @@ function PlayerCircle({ p, isOpp, color, size, isSelected, onPointerDown }) {
         touchAction: 'none',
       }}
     >
-      <span style={{ color: '#fff', fontWeight: 700, fontSize: sz > 40 ? 14 : 12, lineHeight: 1 }}>{label}</span>
+      <span style={{ color: txt, fontWeight: 700, fontSize: sz > 40 ? 14 : 12, lineHeight: 1 }}>{label}</span>
       {subLabel && (
         <span style={{
-          color: 'rgba(255,255,255,0.75)', fontSize: sz > 40 ? 8 : 7,
+          color: subTxt, fontSize: sz > 40 ? 8 : 7,
           lineHeight: 1, maxWidth: sz - 8,
           overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
         }}>{subLabel}</span>
@@ -427,7 +432,9 @@ export default function SketchPage() {
   const oppPlayers     = activeState?.oppPlayers || []
   const arrows         = (activeState?.arrows    || []).map(normalizeArrow).filter(Boolean)
   const myColor        = team?.color_primary || '#00c853'
+  const myTextColor    = team?.color_accent || getContrastTextColor(myColor)
   const oppColor       = getOpponentColor(team?.color_primary)
+  const oppTextColor   = getContrastTextColor(oppColor)
   const oppFormationId = oppFormationIds[activeSketchId] || null
   const myFormationId  = myFormationIds[activeSketchId]  || null
   const formationList  = team ? (FORMATIONS_BY_DIVISION[team.division] || []) : []
@@ -921,26 +928,42 @@ export default function SketchPage() {
           aria-label="Undo"
           title="Undo (Ctrl+Z)"
           style={{
-            height: 28, padding: '0 10px', borderRadius: 6, fontSize: 16,
+            height: 28, padding: '0 10px', borderRadius: 6,
             background: 'none',
             border: '1px solid rgba(255,255,255,0.15)',
-            color: history.length === 0 ? 'rgba(255,255,255,0.35)' : 'rgba(255,255,255,0.7)',
+            color: history.length === 0 ? 'rgba(255,255,255,0.35)' : '#fff',
             cursor: history.length === 0 ? 'default' : 'pointer',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}
-        >↩</button>
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" strokeWidth="2.2"
+            strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="9 14 4 9 9 4" />
+            <path d="M20 20v-7a4 4 0 0 0-4-4H4" />
+          </svg>
+        </button>
         <button
           onClick={redo}
           disabled={future.length === 0}
           aria-label="Redo"
           title="Redo (Ctrl+Y)"
           style={{
-            height: 28, padding: '0 10px', borderRadius: 6, fontSize: 16,
+            height: 28, padding: '0 10px', borderRadius: 6,
             background: 'none',
             border: '1px solid rgba(255,255,255,0.15)',
-            color: future.length === 0 ? 'rgba(255,255,255,0.35)' : 'rgba(255,255,255,0.7)',
+            color: future.length === 0 ? 'rgba(255,255,255,0.35)' : '#fff',
             cursor: future.length === 0 ? 'default' : 'pointer',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}
-        >↪</button>
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" strokeWidth="2.2"
+            strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="15 14 20 9 15 4" />
+            <path d="M4 20v-7a4 4 0 0 1 4-4h12" />
+          </svg>
+        </button>
 
         {/* Utility buttons */}
         <div style={{ position: 'relative' }}>
@@ -1012,7 +1035,7 @@ export default function SketchPage() {
           <div key={p.id} style={{ flexShrink: 0, cursor: 'grab', touchAction: 'none' }}
             onPointerDown={e => onPlayerPointerDown(e, 'opp', p.id)}
           >
-            <PlayerCircle p={p} isOpp color={oppColor} size={circleSize} onPointerDown={null} />
+            <PlayerCircle p={p} isOpp color={oppColor} textColor={oppTextColor} size={circleSize} onPointerDown={null} />
           </div>
         ))}
         {oppBenchPlayers.length === 0 && (
@@ -1113,6 +1136,7 @@ export default function SketchPage() {
               p={p}
               isOpp={playerType === 'opp'}
               color={playerType === 'opp' ? oppColor : myColor}
+              textColor={playerType === 'opp' ? oppTextColor : myTextColor}
               size={circleSize}
               isSelected={false}
               onPointerDown={null}
@@ -1147,7 +1171,7 @@ export default function SketchPage() {
           <div key={p.id} style={{ flexShrink: 0, cursor: 'grab', touchAction: 'none' }}
             onPointerDown={e => onPlayerPointerDown(e, 'my', p.id)}
           >
-            <PlayerCircle p={p} color={myColor} size={circleSize} onPointerDown={null} />
+            <PlayerCircle p={p} color={myColor} textColor={myTextColor} size={circleSize} onPointerDown={null} />
           </div>
         ))}
         {myBenchPlayers.length === 0 && (
