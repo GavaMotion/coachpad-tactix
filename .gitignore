@@ -5,3 +5,5 @@ dist
 supabase/.env
 
 .vercel
+
+.claude/settings.local.json
