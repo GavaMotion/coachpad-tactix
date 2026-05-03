@@ -22,8 +22,16 @@ const FALLBACK = { bg: 'rgba(107,114,128,0.18)', color: '#d1d5db', border: 'rgba
 
 export default function PlayerCard({ player, onEdit }) {
   return (
-    <div className="flex items-center gap-3 rounded-xl px-4 py-3 transition group"
-      style={{ background: 'var(--bg-panel)', border: '1px solid var(--border-purple)' }}>
+    <button
+      type="button"
+      onClick={() => onEdit(player)}
+      className="w-full text-left flex items-center gap-3 rounded-xl px-4 py-3 transition group hover:bg-white/5"
+      style={{
+        background: 'var(--bg-panel)',
+        border: '1px solid var(--border-purple)',
+        cursor: 'pointer',
+      }}
+    >
       {/* Jersey number badge */}
       <div
         className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm"
@@ -58,17 +66,16 @@ export default function PlayerCard({ player, onEdit }) {
         </div>
       </div>
 
-      {/* Edit (delete lives inside the edit modal to avoid accidental taps) */}
-      <button
-        onClick={() => onEdit(player)}
-        className="p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-gray-700 transition"
-        title="Edit player"
+      {/* Edit pencil — visual affordance; whole card is clickable */}
+      <span
+        aria-hidden="true"
+        className="p-1.5 rounded-lg text-gray-400 group-hover:text-white transition flex-shrink-0"
       >
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
             d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
         </svg>
-      </button>
-    </div>
+      </span>
+    </button>
   )
 }
