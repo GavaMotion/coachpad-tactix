@@ -20,7 +20,7 @@ const POSITION_STYLES = {
 
 const FALLBACK = { bg: 'rgba(107,114,128,0.18)', color: '#d1d5db', border: 'rgba(107,114,128,0.4)' }
 
-export default function PlayerCard({ player, onEdit, onDelete }) {
+export default function PlayerCard({ player, onEdit }) {
   return (
     <div className="flex items-center gap-3 rounded-xl px-4 py-3 transition group"
       style={{ background: 'var(--bg-panel)', border: '1px solid var(--border-purple)' }}>
@@ -58,29 +58,17 @@ export default function PlayerCard({ player, onEdit, onDelete }) {
         </div>
       </div>
 
-      {/* Actions */}
-      <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition">
-        <button
-          onClick={() => onEdit(player)}
-          className="p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-gray-700 transition"
-          title="Edit player"
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-              d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-          </svg>
-        </button>
-        <button
-          onClick={() => onDelete(player.id)}
-          className="p-1.5 rounded-lg text-gray-400 hover:text-red-400 hover:bg-red-900/30 transition"
-          title="Remove player"
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-          </svg>
-        </button>
-      </div>
+      {/* Edit (delete lives inside the edit modal to avoid accidental taps) */}
+      <button
+        onClick={() => onEdit(player)}
+        className="p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-gray-700 transition"
+        title="Edit player"
+      >
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+        </svg>
+      </button>
     </div>
   )
 }

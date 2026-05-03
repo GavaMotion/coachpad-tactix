@@ -12,12 +12,27 @@ export const POSITIONS = [
   { id: 'ST',    label: 'ST',    desc: 'Striker' },
 ]
 
-export default function AddPlayerModal({ onSave, onClose, initial }) {
+export default function AddPlayerModal({ onSave, onClose, onDelete, initial }) {
   const [name,      setName]      = useState(initial?.name || '')
   const [jersey,    setJersey]    = useState(initial?.jersey_number ?? '')
   const [positions, setPositions] = useState(initial?.positions || [])
   const [positionRatings, setPositionRatings] = useState(initial?.position_ratings || {})
   const [error,     setError]     = useState('')
+  const [confirmingDelete, setConfirmingDelete] = useState(false)
+  const [deleting,         setDeleting]         = useState(false)
+
+  async function handleConfirmDelete() {
+    if (!initial || !onDelete) return
+    try {
+      setDeleting(true)
+      await onDelete(initial.id)
+      onClose()
+    } catch (err) {
+      setError(err.message || 'Could not delete player')
+      setDeleting(false)
+      setConfirmingDelete(false)
+    }
+  }
 
   function handlePositionToggle(id) {
     setPositions(prev => {
@@ -175,8 +190,114 @@ export default function AddPlayerModal({ onSave, onClose, initial }) {
               {initial ? 'Save Changes' : 'Add Player'}
             </button>
           </div>
+
+          {/* Delete — only when editing, separated from primary actions to prevent accidental taps */}
+          {initial && onDelete && (
+            <div style={{
+              marginTop: 16,
+              paddingTop: 14,
+              borderTop: '1px solid rgba(255,255,255,0.08)',
+              display: 'flex',
+              justifyContent: 'center',
+            }}>
+              <button
+                type="button"
+                onClick={() => setConfirmingDelete(true)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: 'rgba(248,113,113,0.85)',
+                  fontSize: 13,
+                  fontWeight: 500,
+                  cursor: 'pointer',
+                  padding: '6px 12px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 6,
+                }}
+              >
+                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+                Remove player from roster
+              </button>
+            </div>
+          )}
         </form>
       </div>
+
+      {/* Confirm-delete dialog (sits on top of the edit modal) */}
+      {confirmingDelete && initial && (
+        <div
+          onClick={() => !deleting && setConfirmingDelete(false)}
+          style={{
+            position: 'fixed', inset: 0, zIndex: 60,
+            background: 'rgba(0,0,0,0.75)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            padding: 20,
+          }}
+        >
+          <div
+            onClick={e => e.stopPropagation()}
+            style={{
+              background: 'var(--bg-panel)',
+              border: '1px solid rgba(248,113,113,0.35)',
+              borderRadius: 14,
+              padding: '20px 22px',
+              maxWidth: 360,
+              width: '100%',
+              boxShadow: '0 12px 32px rgba(0,0,0,0.5)',
+            }}
+          >
+            <div style={{
+              fontSize: 16, fontWeight: 700, color: '#fff', marginBottom: 6,
+            }}>
+              Remove {initial.name}?
+            </div>
+            <div style={{
+              fontSize: 13, color: 'rgba(255,255,255,0.65)', lineHeight: 1.45,
+              marginBottom: 16,
+            }}>
+              This removes the player from your roster and any future
+              lineups. This can&apos;t be undone.
+            </div>
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button
+                type="button"
+                disabled={deleting}
+                onClick={() => setConfirmingDelete(false)}
+                style={{
+                  flex: 1, padding: '10px 12px', borderRadius: 8,
+                  background: 'transparent',
+                  border: '1px solid rgba(255,255,255,0.18)',
+                  color: '#d1d5db',
+                  fontSize: 13, fontWeight: 600,
+                  cursor: deleting ? 'not-allowed' : 'pointer',
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={deleting}
+                onClick={handleConfirmDelete}
+                style={{
+                  flex: 1, padding: '10px 12px', borderRadius: 8,
+                  background: '#dc2626',
+                  border: '1px solid #b91c1c',
+                  color: '#fff',
+                  fontSize: 13, fontWeight: 700,
+                  cursor: deleting ? 'not-allowed' : 'pointer',
+                  opacity: deleting ? 0.7 : 1,
+                }}
+              >
+                {deleting ? 'Removing…' : 'Remove player'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

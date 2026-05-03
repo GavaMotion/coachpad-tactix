@@ -656,7 +656,6 @@ export default function MyTeamPage({ onSignOut, onCreateTeam, onShowOnboarding, 
                         key={player.id}
                         player={player}
                         onEdit={openEdit}
-                        onDelete={handleDeletePlayer}
                       />
                     ))}
                   </div>
@@ -820,6 +819,7 @@ export default function MyTeamPage({ onSignOut, onCreateTeam, onShowOnboarding, 
         <AddPlayerModal
           initial={editingPlayer}
           onSave={handleSavePlayer}
+          onDelete={handleDeletePlayer}
           onClose={() => { setShowModal(false); setEditingPlayer(null) }}
         />
       )}
