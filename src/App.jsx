@@ -706,10 +706,9 @@ function AppContent({ tab, setTab, onSignOut, onShowOnboarding }) {
   useEffect(() => {
     if (!isOnline) {
       wasOfflineRef.current = true
-      addToast('You\'re offline — changes will be saved when you reconnect', 'warning', 5000)
     } else if (wasOfflineRef.current) {
       wasOfflineRef.current = false
-      addToast('Back online — syncing changes…', 'success', 3000)
+      sessionStorage.removeItem('offlineQueueNotice')
       syncPendingChanges().then(({ synced, failed }) => {
         if (synced > 0) addToast(`${synced} change${synced === 1 ? '' : 's'} synced`, 'success', 3000)
         if (failed > 0) addToast(`${failed} change${failed === 1 ? '' : 's'} could not be synced`, 'error', 5000)
@@ -719,6 +718,7 @@ function AppContent({ tab, setTab, onSignOut, onShowOnboarding }) {
 
   useEffect(() => {
     function onUnhandledRejection(event) {
+      if (!navigator.onLine) return
       if (event.reason?.message?.includes('fetch')) {
         addToast('Connection error — please check your internet', 'error')
       }
@@ -767,16 +767,22 @@ function AppContent({ tab, setTab, onSignOut, onShowOnboarding }) {
   return (
     <div className="flex flex-col bg-gray-950" style={{ height: '100dvh', overflow: 'hidden' }}>
       {!isOnline && (
-        <div style={{
-          position: 'fixed', top: 0, left: 0, right: 0, zIndex: 99997,
-          background: 'rgba(120,70,8,0.97)', backdropFilter: 'blur(4px)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          gap: 6, padding: '6px 16px', fontSize: 12, color: '#fff', fontWeight: 500,
-        }}>
-          <span>⚡</span>
-          <span>
-            You're offline{cacheAge ? ` — showing data from ${cacheAge}` : ''}
-          </span>
+        <div
+          title={`Offline${cacheAge ? ` — showing data from ${cacheAge}` : ''} • Changes sync when reconnected`}
+          style={{
+            position: 'fixed', top: 8, right: 8, zIndex: 99997,
+            display: 'inline-flex', alignItems: 'center', gap: 5,
+            padding: '3px 8px', borderRadius: 999,
+            background: 'rgba(120,70,8,0.85)',
+            fontSize: 10, color: 'rgba(255,255,255,0.85)', fontWeight: 500,
+            letterSpacing: 0.3, pointerEvents: 'auto', userSelect: 'none',
+          }}
+        >
+          <span style={{
+            width: 6, height: 6, borderRadius: '50%',
+            background: '#f4a13b', display: 'inline-block',
+          }} />
+          offline
         </div>
       )}
       {isWide && <AppHeader onSignOut={onSignOut} />}
