@@ -1,0 +1,380 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SquadIQ Admin</title>
+  <style>
+    :root {
+      --bg: #0d0d1a;
+      --panel: #1a1a2e;
+      --panel-2: #13131f;
+      --border: rgba(255,255,255,0.08);
+      --border-strong: rgba(255,255,255,0.16);
+      --text: #fff;
+      --muted: rgba(255,255,255,0.5);
+      --dim: rgba(255,255,255,0.3);
+      --accent: #00c853;
+      --warn: #f4a13b;
+      --danger: #E24B4A;
+      --info: #00BCD4;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { background: var(--bg); color: var(--text); }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      padding: 24px;
+      min-height: 100vh;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 6px; flex-wrap: wrap; gap: 8px; }
+    h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.3px; }
+    .subtitle { color: var(--muted); font-size: 12px; margin-bottom: 20px; }
+    .updated { color: var(--dim); font-size: 11px; }
+
+    .summary { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+    .summary-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 16px;
+      min-width: 110px;
+      flex: 0 0 auto;
+    }
+    .summary-label { color: var(--muted); font-size: 10px; text-transform: uppercase; letter-spacing: 0.6px; font-weight: 600; }
+    .summary-value { font-size: 22px; font-weight: 700; margin-top: 2px; line-height: 1.1; }
+    .summary-value.accent { color: var(--accent); }
+    .summary-value.warn { color: var(--warn); }
+    .summary-value.danger { color: var(--danger); }
+
+    .controls { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; align-items: center; }
+    .filter-btn {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 7px 14px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: border-color 0.12s, background 0.12s, color 0.12s;
+      font-family: inherit;
+    }
+    .filter-btn:hover { border-color: var(--border-strong); }
+    .filter-btn.active {
+      background: var(--accent);
+      color: #0a1f12;
+      border-color: var(--accent);
+      font-weight: 700;
+    }
+    .search {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 7px 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      min-width: 220px;
+      font-family: inherit;
+    }
+    .search:focus { outline: none; border-color: var(--accent); }
+    .search::placeholder { color: var(--dim); }
+    .spacer { flex: 1; }
+    .refresh-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 7px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .refresh-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .refresh-btn.loading { opacity: 0.5; cursor: wait; }
+
+    .table-wrap {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    table { width: 100%; border-collapse: collapse; }
+    th {
+      text-align: left;
+      padding: 12px 16px;
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      user-select: none;
+      white-space: nowrap;
+      background: var(--panel-2);
+    }
+    th:hover { color: var(--text); }
+    th.sorted { color: var(--accent); }
+    th.sorted::after { content: ''; display: inline-block; margin-left: 6px; }
+    th.sorted.desc::after { content: '↓'; }
+    th.sorted.asc::after { content: '↑'; }
+    td { padding: 12px 16px; border-bottom: 1px solid var(--border); font-size: 13px; vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    tr.row { transition: background 0.1s; }
+    tr.row:hover { background: rgba(255,255,255,0.025); }
+
+    .email { font-weight: 500; }
+    .provider { color: var(--dim); font-size: 11px; margin-left: 6px; text-transform: uppercase; letter-spacing: 0.4px; }
+    .num { font-variant-numeric: tabular-nums; color: var(--muted); }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: lowercase;
+      letter-spacing: 0.2px;
+    }
+    .badge-trial { background: rgba(244,161,59,0.15); color: var(--warn); }
+    .badge-solo,
+    .badge-premium { background: rgba(0,200,83,0.15); color: var(--accent); }
+    .badge-expired { background: rgba(226,75,74,0.15); color: var(--danger); }
+    .badge-none { background: rgba(255,255,255,0.05); color: var(--dim); }
+    .override { color: var(--info); font-size: 10px; margin-left: 4px; font-weight: 600; }
+
+    .trial-cell { color: var(--muted); font-size: 12px; }
+    .trial-cell.urgent { color: var(--warn); font-weight: 600; }
+
+    .empty, .loading-state { padding: 60px 20px; text-align: center; color: var(--muted); }
+    .error {
+      padding: 14px 16px;
+      background: rgba(226,75,74,0.08);
+      border: 1px solid rgba(226,75,74,0.4);
+      border-radius: 8px;
+      color: #ff8b8b;
+      margin-bottom: 14px;
+      font-size: 13px;
+    }
+
+    @media (max-width: 720px) {
+      body { padding: 14px; }
+      .summary-card { min-width: 90px; padding: 10px 12px; }
+      .summary-value { font-size: 18px; }
+      th:nth-child(4), td:nth-child(4),
+      th:nth-child(5), td:nth-child(5) { display: none; }
+      .search { min-width: 0; flex: 1; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>SquadIQ Admin</h1>
+    <span class="updated" id="last-updated"></span>
+  </header>
+  <div class="subtitle">Read-only user dashboard · localhost only</div>
+
+  <div class="summary" id="summary"></div>
+
+  <div class="controls">
+    <button class="filter-btn active" data-filter="all">All</button>
+    <button class="filter-btn" data-filter="paying">Paying</button>
+    <button class="filter-btn" data-filter="trial">Trial</button>
+    <button class="filter-btn" data-filter="expired">Expired</button>
+    <button class="filter-btn" data-filter="new">New (7d)</button>
+    <button class="filter-btn" data-filter="inactive">Inactive (30d)</button>
+    <button class="filter-btn" data-filter="no-team">No team</button>
+    <span class="spacer"></span>
+    <input class="search" id="search" type="text" placeholder="Search email..." autocomplete="off" />
+    <button class="refresh-btn" id="refresh">⟳ Refresh</button>
+  </div>
+
+  <div id="error" class="error" style="display:none"></div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th data-sort="email">Email</th>
+          <th data-sort="plan">Plan</th>
+          <th data-sort="signup" class="sorted desc">Signed up</th>
+          <th data-sort="last_seen">Last seen</th>
+          <th data-sort="teams">Teams</th>
+          <th>Trial</th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+    <div id="empty" class="empty" style="display:none">No users match these filters.</div>
+    <div id="loading" class="loading-state">Loading…</div>
+  </div>
+
+<script>
+  let allUsers = []
+  let activeFilter = 'all'
+  let searchQ = ''
+  let sortField = 'signup'
+  let sortDesc = true
+
+  const $ = (id) => document.getElementById(id)
+  const tbody = $('tbody')
+  const summary = $('summary')
+  const errBox = $('error')
+
+  function rel(iso) {
+    if (!iso) return 'never'
+    const ms = Date.now() - new Date(iso).getTime()
+    if (ms < 0) return 'in future'
+    const h = Math.floor(ms / 3600000)
+    if (h < 1) return 'just now'
+    if (h < 24) return h + 'h ago'
+    const d = Math.floor(h / 24)
+    if (d < 30) return d + 'd ago'
+    const mo = Math.floor(d / 30)
+    if (mo < 12) return mo + 'mo ago'
+    return Math.floor(mo / 12) + 'y ago'
+  }
+  function trialLeft(u) {
+    if (u.plan !== 'trial' || !u.trial_end) return { text: '', urgent: false }
+    const d = Math.ceil((new Date(u.trial_end) - Date.now()) / 86400000)
+    if (d <= 0) return { text: 'expired', urgent: true }
+    return { text: d + 'd left', urgent: d <= 3 }
+  }
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))
+  }
+
+  function applyFilter(users) {
+    let r = users
+    if (activeFilter === 'paying')   r = r.filter(u => u.plan === 'solo' || u.plan === 'premium')
+    if (activeFilter === 'trial')    r = r.filter(u => u.plan === 'trial')
+    if (activeFilter === 'expired')  r = r.filter(u => u.plan === 'expired')
+    if (activeFilter === 'new')      { const c = Date.now() - 7*86400000; r = r.filter(u => new Date(u.signup) >= c) }
+    if (activeFilter === 'inactive') { const c = Date.now() - 30*86400000; r = r.filter(u => !u.last_seen || new Date(u.last_seen) < c) }
+    if (activeFilter === 'no-team')  r = r.filter(u => u.teams === 0)
+    if (searchQ) {
+      const q = searchQ.toLowerCase()
+      r = r.filter(u => u.email.toLowerCase().includes(q))
+    }
+    return r
+  }
+  function sortRows(rows) {
+    const dir = sortDesc ? 1 : -1
+    return [...rows].sort((a, b) => {
+      switch (sortField) {
+        case 'email': return a.email.localeCompare(b.email) * -dir
+        case 'plan':  return a.plan.localeCompare(b.plan) * -dir
+        case 'last_seen': return (new Date(b.last_seen||0) - new Date(a.last_seen||0)) * dir
+        case 'teams': return (b.teams - a.teams) * dir
+        default: return (new Date(b.signup) - new Date(a.signup)) * dir
+      }
+    })
+  }
+
+  function renderSummary(filtered) {
+    const total = filtered.length
+    const counts = {}
+    for (const u of filtered) counts[u.plan] = (counts[u.plan] || 0) + 1
+    const paying = (counts.solo || 0) + (counts.premium || 0)
+    const expiring = filtered.filter(u => {
+      if (u.plan !== 'trial' || !u.trial_end) return false
+      const d = Math.ceil((new Date(u.trial_end) - Date.now()) / 86400000)
+      return d > 0 && d <= 7
+    }).length
+    summary.innerHTML = `
+      <div class="summary-card"><div class="summary-label">Users</div><div class="summary-value">${total}</div></div>
+      <div class="summary-card"><div class="summary-label">Paying</div><div class="summary-value accent">${paying}</div></div>
+      <div class="summary-card"><div class="summary-label">Trial</div><div class="summary-value warn">${counts.trial || 0}</div></div>
+      <div class="summary-card"><div class="summary-label">Expiring ≤7d</div><div class="summary-value warn">${expiring}</div></div>
+      <div class="summary-card"><div class="summary-label">Expired</div><div class="summary-value danger">${counts.expired || 0}</div></div>
+    `
+  }
+
+  function renderTable(rows) {
+    $('loading').style.display = 'none'
+    if (rows.length === 0) {
+      tbody.innerHTML = ''
+      $('empty').style.display = 'block'
+      return
+    }
+    $('empty').style.display = 'none'
+    tbody.innerHTML = rows.map(u => {
+      const tl = trialLeft(u)
+      const planClass = ['trial','solo','premium','expired'].includes(u.plan) ? u.plan : 'none'
+      const override = u.plan_override ? `<span class="override">${escapeHtml(u.plan_override)}</span>` : ''
+      const provider = u.provider && u.provider !== 'email' && u.provider !== '?' ? `<span class="provider">${escapeHtml(u.provider)}</span>` : ''
+      return `<tr class="row">
+        <td><span class="email">${escapeHtml(u.email)}</span>${provider}</td>
+        <td><span class="badge badge-${planClass}">${escapeHtml(u.plan)}</span>${override}</td>
+        <td class="num">${rel(u.signup)}</td>
+        <td class="num">${rel(u.last_seen)}</td>
+        <td class="num">${u.teams}</td>
+        <td class="trial-cell ${tl.urgent ? 'urgent' : ''}">${tl.text}</td>
+      </tr>`
+    }).join('')
+  }
+
+  function rerender() {
+    const filtered = applyFilter(allUsers)
+    renderSummary(filtered)
+    renderTable(sortRows(filtered))
+    document.querySelectorAll('th[data-sort]').forEach(th => {
+      th.classList.remove('sorted', 'asc', 'desc')
+      if (th.dataset.sort === sortField) {
+        th.classList.add('sorted', sortDesc ? 'desc' : 'asc')
+      }
+    })
+  }
+
+  async function load() {
+    errBox.style.display = 'none'
+    const refreshBtn = $('refresh')
+    refreshBtn.classList.add('loading')
+    try {
+      const r = await fetch('/api/users')
+      if (!r.ok) throw new Error(await r.text() || ('HTTP ' + r.status))
+      allUsers = await r.json()
+      $('last-updated').textContent = 'updated ' + new Date().toLocaleTimeString()
+      rerender()
+    } catch (e) {
+      errBox.textContent = 'Failed to load users: ' + e.message
+      errBox.style.display = 'block'
+      $('loading').style.display = 'none'
+    } finally {
+      refreshBtn.classList.remove('loading')
+    }
+  }
+
+  document.querySelectorAll('.filter-btn[data-filter]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-btn[data-filter]').forEach(b => b.classList.remove('active'))
+      btn.classList.add('active')
+      activeFilter = btn.dataset.filter
+      rerender()
+    })
+  })
+
+  let searchTimer
+  $('search').addEventListener('input', e => {
+    clearTimeout(searchTimer)
+    searchTimer = setTimeout(() => { searchQ = e.target.value; rerender() }, 120)
+  })
+
+  document.querySelectorAll('th[data-sort]').forEach(th => {
+    th.addEventListener('click', () => {
+      const f = th.dataset.sort
+      if (sortField === f) sortDesc = !sortDesc
+      else { sortField = f; sortDesc = true }
+      rerender()
+    })
+  })
+
+  $('refresh').addEventListener('click', load)
+
+  load()
+</script>
+</body>
+</html>
