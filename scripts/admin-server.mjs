@@ -61,10 +61,20 @@ async function loadUsers() {
 
 const PORT = Number(process.env.ADMIN_PORT) || 8787
 
+// Allow loopback and Tailscale CGNAT (100.64.0.0/10).  No other interfaces.
+function isAllowedPeer(ra) {
+  if (ra.startsWith('127.') || ra === '::1' || ra === '::ffff:127.0.0.1') return true
+  const m = ra.match(/^(?:::ffff:)?100\.(\d{1,3})\./)
+  if (m) {
+    const o2 = Number(m[1])
+    if (o2 >= 64 && o2 <= 127) return true
+  }
+  return false
+}
+
 const server = createServer(async (req, res) => {
-  // Defense in depth: refuse anything not from the local machine.
   const ra = req.socket.remoteAddress || ''
-  if (!ra.startsWith('127.') && ra !== '::1' && ra !== '::ffff:127.0.0.1') {
+  if (!isAllowedPeer(ra)) {
     res.writeHead(403); res.end('forbidden'); return
   }
 
@@ -89,9 +99,10 @@ const server = createServer(async (req, res) => {
   }
 })
 
-server.listen(PORT, '127.0.0.1', () => {
+server.listen(PORT, '0.0.0.0', () => {
   console.log('')
   console.log(`  SquadIQ Admin → http://localhost:${PORT}`)
-  console.log(`  Localhost only (bound to 127.0.0.1).  Press Ctrl+C to stop.`)
+  console.log(`  Reachable from loopback + Tailscale (100.64.0.0/10) only.`)
+  console.log(`  Press Ctrl+C to stop.`)
   console.log('')
 })
