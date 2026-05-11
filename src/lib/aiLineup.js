@@ -51,19 +51,13 @@ const LABEL_ORDER = ['GK', 'CB', 'RB', 'LB', 'RB/LB', 'SW', 'CDM', 'DM', 'CM', '
 
 export function generateAILineup({
   players,
-  absentPlayerIds = new Set(),
-  absentQuarters  = {},
-  formation,
-  quarters        = [1, 2, 3, 4],
+  absentPlayerIds     = new Set(),
+  absentQuarters      = {},
+  formation,             // single shared formation (back-compat / single-quarter mode)
+  formationsByQuarter,   // optional per-quarter formation map: { 1: f, 2: f, ... }
+  quarters            = [1, 2, 3, 4],
 }) {
-  const slots        = formation.slots || []
   const allAvailable = players.filter(p => !absentPlayerIds.has(p.id))
-
-  const sortedSlots = [...slots].sort((a, b) => {
-    const ai = LABEL_ORDER.indexOf(a.label)
-    const bi = LABEL_ORDER.indexOf(b.label)
-    return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi)
-  })
 
   const quarterCount = {}
   allAvailable.forEach(p => { quarterCount[p.id] = 0 })
@@ -84,6 +78,26 @@ export function generateAILineup({
   const warnings      = []
 
   for (const q of quarters) {
+    // Per-quarter formation (falls back to the shared one)
+    const qFormation = formationsByQuarter?.[q] || formation
+    if (!qFormation) {
+      warnings.push(`Q${q}: no formation set`)
+      lineup[q] = {}
+      continue
+    }
+    const slots = qFormation.slots || []
+    const sortedSlots = [...slots].sort((a, b) => {
+      const ai = LABEL_ORDER.indexOf(a.label)
+      const bi = LABEL_ORDER.indexOf(b.label)
+      return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi)
+    })
+
+    // Quarters remaining INCLUDING this one — used for the hard rotation
+    // constraint. A player whose deficit (MIN_QUARTERS − quartersPlayed) is
+    // at least quartersLeft can no longer reach MIN_QUARTERS unless they
+    // play every remaining quarter, so we mark them must-play.
+    const quartersLeft = quarters.length - quarters.indexOf(q)
+
     const available = allAvailable.filter(p => {
       const restricted = absentQuarters[p.id] || []
       return !restricted.includes(q)
@@ -113,7 +127,12 @@ export function generateAILineup({
         if (usedIds.has(p.id)) continue
         const rating = getRating(p, slot.label)
         if (rating <= 0) continue
-        const minuteBonus = Math.max(0, MIN_QUARTERS - quarterCount[p.id]) * 2
+        const deficit  = MIN_QUARTERS - quarterCount[p.id]
+        const mustPlay = deficit >= quartersLeft
+        // Hard constraint: a forced player must beat any non-forced regardless
+        // of skill rating. Soft pressure (×5, up from ×2) keeps un-played
+        // players slightly favoured even before the hard constraint kicks in.
+        const minuteBonus = mustPlay ? 10000 : Math.max(0, deficit) * 5
         const score = rating * 10 + minuteBonus
         if (score > bestScore) { bestScore = score; best = p }
       }

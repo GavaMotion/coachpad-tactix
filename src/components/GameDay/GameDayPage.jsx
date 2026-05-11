@@ -53,9 +53,6 @@ export default function GameDayPage() {
   const [isWide,          setIsWide]           = useState(
     () => typeof window !== 'undefined' && window.innerWidth >= 768
   )
-  const [isTablet,        setIsTablet]         = useState(
-    () => typeof window !== 'undefined' && window.innerWidth >= 768 && window.innerWidth < 1280
-  )
   const [showShareSheet,  setShowShareSheet]  = useState(false)
   const [isExporting,     setIsExporting]     = useState(false)
   const [shakingPlayerId, setShakingPlayerId] = useState(null)
@@ -108,7 +105,6 @@ export default function GameDayPage() {
     function onResize() {
       const w = window.innerWidth
       setIsWide(w >= 768)
-      setIsTablet(w >= 768 && w < 1280)
     }
     window.addEventListener('resize', onResize, { passive: true })
     return () => window.removeEventListener('resize', onResize)
@@ -757,30 +753,27 @@ export default function GameDayPage() {
       ...aiAbsentAll,
     ])
 
-    const combinedLineup        = {}
-    const combinedOutOfPosition = []
-    const combinedWarnings      = []
-
+    // Build a per-quarter formation map so generateAILineup can run all
+    // quarters in a SINGLE call — that's what lets rotation track
+    // quartersPlayed across quarters and respect the everybody-plays rule.
+    const formationsByQuarter = {}
     for (const q of quartersToGenerate) {
       const qFormationId = planStates[activePlanId]?.quarters?.[q]?.formationId
       const qFormation   = getFormationById(qFormationId) || formation
-      if (!qFormation) {
-        combinedWarnings.push(`Q${q}: no formation set`)
-        continue
-      }
-
-      const { lineup: qLineup, outOfPosition: qOOP, warnings: qWarnings } = generateAILineup({
-        players,
-        absentPlayerIds: allAbsentIds,
-        absentQuarters:  aiAbsentQuarters,
-        formation:       qFormation,
-        quarters:        [q],
-      })
-
-      combinedLineup[q] = qLineup[q] || {}
-      combinedOutOfPosition.push(...qOOP)
-      combinedWarnings.push(...qWarnings)
+      if (qFormation) formationsByQuarter[q] = qFormation
     }
+
+    const {
+      lineup:        combinedLineup,
+      outOfPosition: combinedOutOfPosition,
+      warnings:      combinedWarnings,
+    } = generateAILineup({
+      players,
+      absentPlayerIds: allAbsentIds,
+      absentQuarters:  aiAbsentQuarters,
+      formationsByQuarter,
+      quarters:        quartersToGenerate,
+    })
 
     setPlanStates(prev => {
       const current        = prev[activePlanId] || {}
@@ -1067,7 +1060,7 @@ export default function GameDayPage() {
 
         {/* ── Field pane ── */}
         <div style={{
-          flex:           isWide ? (isTablet ? '0 0 30%' : '0 0 60%') : '0 0 55%',
+          flex:           isWide ? '0 0 60%' : '0 0 55%',
           height:         isWide ? '100%' : undefined,
           display:        'flex',
           flexDirection:  'row',
