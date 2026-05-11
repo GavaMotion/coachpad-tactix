@@ -359,6 +359,10 @@ export default function PracticePage() {
   }, [dragState]) // eslint-disable-line react-hooks/exhaustive-deps
 
   function handleDrillDrop(e, drag) {
+    if (drag.source !== 'library') {
+      isOverPlanRef.current = false
+      return
+    }
     let isOverLibrary = false
     if (libraryAreaRef.current) {
       const rect = libraryAreaRef.current.getBoundingClientRect()
@@ -367,7 +371,7 @@ export default function PracticePage() {
         e.clientY >= rect.top  && e.clientY <= rect.bottom
       )
     }
-    if (isOverLibrary && drag.source === 'library') {
+    if (isOverLibrary) {
       isOverPlanRef.current = false
       return
     }
