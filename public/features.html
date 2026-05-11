@@ -121,26 +121,62 @@
 
     .feature {
       display: grid;
-      grid-template-columns: 80px 1fr;
-      gap: 1.5rem;
-      padding: 2.5rem 0;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+      padding: 3rem 0;
       border-bottom: 1px solid var(--border);
-      align-items: start;
+      align-items: center;
     }
 
     .feature:last-child { border-bottom: none; }
 
+    .feature:nth-child(odd)  { grid-template-areas: "image content"; }
+    .feature:nth-child(even) { grid-template-areas: "content image"; }
+    .feature-image   { grid-area: image; }
+    .feature-content { grid-area: content; }
+
+    .feature-image {
+      aspect-ratio: 3 / 4;
+      max-width: 360px;
+      width: 100%;
+      margin: 0 auto;
+      border-radius: 22px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+      background: var(--surface);
+      position: relative;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+    }
+
+    .feature-image::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      box-shadow: inset 0 0 60px var(--icon-glow, var(--green-glow));
+      pointer-events: none;
+    }
+
+    .feature-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: top center;
+      display: block;
+    }
+
     .feature-icon {
-      width: 64px;
-      height: 64px;
+      width: 56px;
+      height: 56px;
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 16px;
+      border-radius: 14px;
       display: flex;
       align-items: center;
       justify-content: center;
       position: relative;
       overflow: hidden;
+      margin-bottom: 1rem;
     }
 
     .feature-icon::before {
@@ -365,16 +401,23 @@
 
     footer strong { color: var(--text); }
 
+    @media (max-width: 860px) {
+      .feature,
+      .feature:nth-child(odd),
+      .feature:nth-child(even) {
+        grid-template-columns: 1fr;
+        grid-template-areas: "image" "content";
+        gap: 1.5rem;
+      }
+    }
+
     @media (max-width: 640px) {
       h1 { font-size: 2.1rem; }
       .hero { padding: 3rem 1.5rem 2rem; }
       main { padding: 1rem 1.5rem 4rem; }
-      .feature {
-        grid-template-columns: 1fr;
-        gap: 1rem;
-        padding: 2rem 0;
-      }
+      .feature { padding: 2rem 0; gap: 1.25rem; }
       .feature h2 { font-size: 1.4rem; }
+      .feature-image { border-radius: 14px; }
     }
   </style>
 </head>
@@ -398,16 +441,19 @@
 
 <main>
 
-  <div class="feature">
-    <div class="feature-icon icon-team">
-      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
-        <circle cx="9" cy="7" r="4" />
-        <path d="M23 21v-2a4 4 0 00-3-3.87" />
-        <path d="M16 3.13a4 4 0 010 7.75" />
-      </svg>
+  <div class="feature icon-team">
+    <div class="feature-image">
+      <img src="/features/team.png" alt="My Team in SquadIQ" loading="lazy" />
     </div>
-    <div>
+    <div class="feature-content">
+      <div class="feature-icon icon-team">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+          <circle cx="9" cy="7" r="4" />
+          <path d="M23 21v-2a4 4 0 00-3-3.87" />
+          <path d="M16 3.13a4 4 0 010 7.75" />
+        </svg>
+      </div>
       <span class="feature-number">01 — MY TEAM</span>
       <h2>Your roster, finally organized.</h2>
       <p class="tagline">All your players, positions, and ratings in one place.</p>
@@ -451,19 +497,22 @@
     </div>
   </div>
 
-  <div class="feature">
-    <div class="feature-icon icon-lineup">
-      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="12" cy="4" r="2" />
-        <path d="M12 6v6" />
-        <path d="M9 9l-2 4" />
-        <path d="M15 9l3 3" />
-        <path d="M12 12l-2 5" />
-        <path d="M12 12l3 5" />
-        <circle cx="17" cy="17" r="2.5" />
-      </svg>
+  <div class="feature icon-lineup">
+    <div class="feature-image">
+      <img src="/features/lineup.png" alt="Lineup planner in SquadIQ" loading="lazy" />
     </div>
-    <div>
+    <div class="feature-content">
+      <div class="feature-icon icon-lineup">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="4" r="2" />
+          <path d="M12 6v6" />
+          <path d="M9 9l-2 4" />
+          <path d="M15 9l3 3" />
+          <path d="M12 12l-2 5" />
+          <path d="M12 12l3 5" />
+          <circle cx="17" cy="17" r="2.5" />
+        </svg>
+      </div>
       <span class="feature-number">02 — LINEUP</span>
       <h2>AI does your sub plans.</h2>
       <p class="tagline">No more pre-game spreadsheets at 6am.</p>
@@ -515,18 +564,21 @@
     </div>
   </div>
 
-  <div class="feature">
-    <div class="feature-icon icon-sketch">
-      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="3" y="3" width="18" height="18" rx="2" />
-        <line x1="7" y1="7" x2="10" y2="10" />
-        <line x1="10" y1="7" x2="7" y2="10" />
-        <circle cx="15" cy="9" r="2" />
-        <path d="M7 14 h6" stroke-dasharray="1.5 2" />
-        <path d="M14 17l3-3m0 0v2m0-2h-2" />
-      </svg>
+  <div class="feature icon-sketch">
+    <div class="feature-image">
+      <img src="/features/sketch.png" alt="Sketch board in SquadIQ" loading="lazy" />
     </div>
-    <div>
+    <div class="feature-content">
+      <div class="feature-icon icon-sketch">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="18" height="18" rx="2" />
+          <line x1="7" y1="7" x2="10" y2="10" />
+          <line x1="10" y1="7" x2="7" y2="10" />
+          <circle cx="15" cy="9" r="2" />
+          <path d="M7 14 h6" stroke-dasharray="1.5 2" />
+          <path d="M14 17l3-3m0 0v2m0-2h-2" />
+        </svg>
+      </div>
       <span class="feature-number">03 — SKETCH BOARD</span>
       <h2>Draw plays kids understand.</h2>
       <p class="tagline">The tactical board that finally works on mobile.</p>
@@ -582,17 +634,20 @@
     </div>
   </div>
 
-  <div class="feature">
-    <div class="feature-icon icon-practice">
-      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="5" y="4" width="14" height="17" rx="2" />
-        <rect x="9" y="2" width="6" height="4" rx="1" />
-        <line x1="9" y1="11" x2="15" y2="11" />
-        <line x1="9" y1="14" x2="15" y2="14" />
-        <line x1="9" y1="17" x2="13" y2="17" />
-      </svg>
+  <div class="feature icon-practice">
+    <div class="feature-image">
+      <img src="/features/practice.png" alt="Practice drills in SquadIQ" loading="lazy" />
     </div>
-    <div>
+    <div class="feature-content">
+      <div class="feature-icon icon-practice">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="5" y="4" width="14" height="17" rx="2" />
+          <rect x="9" y="2" width="6" height="4" rx="1" />
+          <line x1="9" y1="11" x2="15" y2="11" />
+          <line x1="9" y1="14" x2="15" y2="14" />
+          <line x1="9" y1="17" x2="13" y2="17" />
+        </svg>
+      </div>
       <span class="feature-number">04 — PRACTICE</span>
       <h2>69 drills. Smart plans.</h2>
       <p class="tagline">Build a structured practice in minutes — or let AI do it.</p>
@@ -644,15 +699,18 @@
     </div>
   </div>
 
-  <div class="feature">
-    <div class="feature-icon icon-standings">
-      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="18" y1="20" x2="18" y2="10" />
-        <line x1="12" y1="20" x2="12" y2="4" />
-        <line x1="6" y1="20" x2="6" y2="14" />
-      </svg>
+  <div class="feature icon-standings">
+    <div class="feature-image">
+      <img src="/features/standings.jpg" alt="League standings in SquadIQ" loading="lazy" />
     </div>
-    <div>
+    <div class="feature-content">
+      <div class="feature-icon icon-standings">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="20" x2="18" y2="10" />
+          <line x1="12" y1="20" x2="12" y2="4" />
+          <line x1="6" y1="20" x2="6" y2="14" />
+        </svg>
+      </div>
       <span class="feature-number">05 — STANDINGS</span>
       <h2>Always know where you stand.</h2>
       <p class="tagline">Real-time standings, auto-refreshed.</p>
